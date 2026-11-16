@@ -1,0 +1,30 @@
+# Build output
+**/bin/
+**/obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# VS Code
+.vscode/
+
+# Rider
+.idea/
+
+# Logs
+*.log
+
+# SQLite
+*.db-shm
+*.db-wal
+
+# Environment
+.env
+
+# Publish
+publish/
+
+# Test Results
+TestResults/
