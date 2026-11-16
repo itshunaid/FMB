@@ -1,0 +1,57 @@
+@model FMB.WebMVC.Controllers.StaffDashboardViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "My account";
+}
+
+<main class="household-portal">
+    <header class="topbar">
+        <div class="topbar-date">@DateTime.Today.ToString("dd-MMM-yyyy")</div>
+        <div class="topbar-actions">
+            <span class="user-pill">@Model.Name · Staff user</span>
+            <form asp-controller="Home" asp-action="Logout" method="post" style="margin:0;">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="topbar-btn">Logout</button>
+            </form>
+        </div>
+    </header>
+
+    <section class="household-welcome">
+        <h1>Afzalus Salam, @Model.Name</h1>
+        <p>Your staff account details.</p>
+    </section>
+
+    <section class="panel staff-profile-card">
+        <h2>My account</h2>
+        <dl class="detail-grid">
+            <dt>Staff ITS ID</dt><dd>@Model.ItsId</dd>
+            <dt>Role</dt><dd>@Model.Role</dd>
+            <dt>Phone</dt><dd>@(string.IsNullOrWhiteSpace(Model.Phone) ? "Not provided" : Model.Phone)</dd>
+            <dt>Status</dt><dd>@Model.Status</dd>
+            <dt>Last sign in</dt><dd>@(Model.LastLogin?.ToLocalTime().ToString("dd-MMM-yyyy HH:mm") ?? "First sign in")</dd>
+        </dl>
+    </section>
+
+    <section class="panel household-section">
+        <h2>Recent account activity</h2>
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead><tr><th>Time</th><th>Activity</th><th>Details</th></tr></thead>
+                <tbody>
+                @if (Model.RecentActivity.Count == 0)
+                {
+                    <tr><td colspan="3" class="empty-state">No recent activity is available.</td></tr>
+                }
+                @foreach (var activity in Model.RecentActivity)
+                {
+                    <tr>
+                        <td>@activity.Timestamp.ToString("dd-MMM-yyyy HH:mm")</td>
+                        <td>@activity.Action</td>
+                        <td>@activity.Target</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>

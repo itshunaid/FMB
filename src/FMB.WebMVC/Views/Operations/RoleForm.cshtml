@@ -1,0 +1,67 @@
+@model RoleFormViewModel
+@using FMB.WebMVC.Services
+@{
+    Layout = "~/Views/Management/_Layout.cshtml";
+    ViewData["Title"] = Model.IsEdit ? "Edit role" : "Add role";
+    var action = Model.IsEdit
+        ? $"/Management/Roles/{Uri.EscapeDataString(Model.Name)}/Edit"
+        : "/Management/Roles/Create";
+    var permissionLabels = new Dictionary<char, string>
+    {
+        ['v'] = "View", ['c'] = "Add", ['e'] = "Edit", ['d'] = "Delete",
+        ['l'] = "Activity logs", ['x'] = "Export"
+    };
+}
+<div class="page-heading">
+    <div><h1>@ViewData["Title"]</h1><p>Choose module permissions and the widgets shown on this role's dashboard.</p></div>
+    <a class="btn-sm" href="/Management/Roles">Back to roles</a>
+</div>
+<div class="panel form-panel">
+    <form method="post" action="@action">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="validation-message"></div>
+        <label asp-for="Name">Role name
+            <input asp-for="Name" readonly="@Model.IsEdit" maxlength="50" autocomplete="off" />
+        </label>
+        <span asp-validation-for="Name" class="validation-message"></span>
+
+        <h2>Module permissions</h2>
+        <p class="muted">Dashboard view is required. Add, edit, delete, activity log and export access are optional per module.</p>
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead><tr><th>Module</th>@foreach (var label in permissionLabels.Values) { <th>@label</th> }</tr></thead>
+                <tbody>
+                @foreach (var module in RoleAccess.Modules)
+                {
+                    <tr>
+                        <td>@module.Value</td>
+                        @foreach (var permission in permissionLabels)
+                        {
+                            var value = $"{module.Key}|{permission.Key}";
+                            <td>
+                                <input type="checkbox" name="Permissions" value="@value"
+                                       checked="@Model.Permissions.Contains(value, StringComparer.Ordinal)" />
+                            </td>
+                        }
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+        <span asp-validation-for="Permissions" class="validation-message"></span>
+
+        <h2>Dashboard widgets</h2>
+        <div class="form-grid">
+            @foreach (var widget in RoleAccess.DashboardWidgetOptions)
+            {
+                <label class="checkbox-label">
+                    <input type="checkbox" name="DashboardWidgets" value="@widget.Key"
+                           checked="@Model.DashboardWidgets.Contains(widget.Key, StringComparer.Ordinal)" />
+                    @widget.Value
+                </label>
+            }
+        </div>
+        <span asp-validation-for="DashboardWidgets" class="validation-message"></span>
+        <div class="form-actions"><button class="btn" type="submit">Save role</button><a class="btn-sm" href="/Management/Roles">Cancel</a></div>
+    </form>
+</div>

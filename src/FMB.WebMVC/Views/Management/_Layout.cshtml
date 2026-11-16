@@ -1,0 +1,51 @@
+@using FMB.WebMVC.Services
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var sessionUser = Context.Session.GetString("FMB.Auth.User");
+    var userParts = sessionUser?.Split('|');
+    var displayName = userParts is { Length: > 2 } ? userParts[2] : "Volunteer";
+    var role = userParts?.ElementAtOrDefault(3) ?? string.Empty;
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? string.Empty;
+}
+
+<div class="app-shell">
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="sidebar-logo">✦</div>
+            <strong>FMB Tiffin</strong>
+        </div>
+        <nav>
+            @if (RoleAccess.Can(role, "dashboard", 'v')) { <a class="sidebar-link @(currentAction is "Dashboard" or "Index" ? "active" : "")" href="/Home/Dashboard">Dashboard</a> }
+            @if (RoleAccess.Can(role, "gate", 'v')) { <a class="sidebar-link @(currentAction == "Gate" ? "active" : "")" href="/Management/Gate">Gate Simulator</a> }
+            @if (RoleAccess.Can(role, "reconciliation", 'v')) { <a class="sidebar-link @(currentAction == "Reconciliation" ? "active" : "")" href="/Management/Reconciliation">Reconciliation</a> }
+            @if (RoleAccess.Can(role, "households", 'v')) { <a class="sidebar-link @(currentAction.Contains("Household", StringComparison.OrdinalIgnoreCase) ? "active" : "")" href="/Management/Households">Households &amp; Tags</a> }
+            @if (RoleAccess.Can(role, "distributors", 'v')) { <a class="sidebar-link @(currentAction.Contains("Distributor", StringComparison.OrdinalIgnoreCase) ? "active" : "")" href="/Management/Distributors">Distributors</a> }
+            @if (RoleAccess.Can(role, "analytics", 'v')) { <a class="sidebar-link @(currentAction == "Analytics" ? "active" : "")" href="/Management/Analytics">Analytics &amp; Reports</a> }
+            <div class="sidebar-caption">Operations</div>
+            @if (RoleAccess.Can(role, "menus", 'v')) { <a class="sidebar-link @(new[] { "Menus", "CreateMenu", "BulkScheduleMenus", "EditMenu" }.Contains(currentAction, StringComparer.OrdinalIgnoreCase) ? "active" : "")" href="/Management/Menus">Daily Menus</a> }
+            @if (RoleAccess.Can(role, "expenses", 'v')) { <a class="sidebar-link @(new[] { "Expenses", "CreateExpense", "EditExpense" }.Contains(currentAction, StringComparer.OrdinalIgnoreCase) ? "active" : "")" href="/Management/Expenses">Expenses</a> }
+            @if (RoleAccess.Can(role, "feedback", 'v')) { <a class="sidebar-link @(currentAction == "Feedback" ? "active" : "")" href="/Management/Feedback">Member Feedback</a> }
+            @if (RoleAccess.Can(role, "queries", 'v')) { <a class="sidebar-link @(new[] { "Queries", "CreateQuery", "ReplyQuery" }.Contains(currentAction, StringComparer.OrdinalIgnoreCase) ? "active" : "")" href="/Management/Queries">Member Queries</a> }
+            @if (RoleAccess.Can(role, "notifications", 'v')) { <a class="sidebar-link @(currentAction == "Notifications" ? "active" : "")" href="/Management/Notifications">Notifications</a> }
+            @if (RoleAccess.Can(role, "audit", 'v')) { <a class="sidebar-link @(new[] { "AuditLogs", "UserActivity" }.Contains(currentAction, StringComparer.OrdinalIgnoreCase) ? "active" : "")" href="/Management/AuditLogs">Audit Logs</a> }
+            @if (RoleAccess.Can(role, "users", 'v')) { <a class="sidebar-link @(new[] { "Users", "CreateUser", "EditUser" }.Contains(currentAction, StringComparer.OrdinalIgnoreCase) ? "active" : "")" href="/Management/Users">System Users</a> }
+            @if (RoleAccess.Can(role, "roles", 'v')) { <a class="sidebar-link @(new[] { "Roles", "ViewRole", "RoleActivity", "CreateRole", "EditRole" }.Contains(currentAction, StringComparer.OrdinalIgnoreCase) ? "active" : "")" href="/Management/Roles">Roles &amp; Permissions</a> }
+        </nav>
+    </aside>
+    <main class="main-panel">
+        <div class="topbar">
+            <div class="topbar-date">Hussaini Alam · @DateTime.Today.ToString("dddd, dd MMM yyyy")</div>
+            <div class="topbar-actions">
+                <span class="user-pill">@displayName</span>
+                <button type="button" class="topbar-btn" data-theme-toggle aria-label="Toggle color theme">Dark mode</button>
+                <form action="/Home/Logout" method="post" style="margin:0;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="topbar-btn">Logout</button>
+                </form>
+            </div>
+        </div>
+        <div class="dashboard-content management-content">
+            @RenderBody()
+        </div>
+    </main>
+</div>

@@ -1,0 +1,35 @@
+@model IReadOnlyList<FMB.Domain.Entities.Household>
+@{
+    Layout = "~/Views/Management/_Layout.cshtml";
+    ViewData["Title"] = "Gate Simulator";
+}
+
+<div class="page-heading">
+    <div><h1>RFID Gate Simulator</h1><p>Simulate reader events and verify scan outcomes.</p></div>
+    <span class="status-chip">Simulation mode</span>
+</div>
+<form id="scanTokenForm">@Html.AntiForgeryToken()</form>
+<div class="panel gate-panel">
+    <label for="tagInput">RFID Tag ID</label>
+    <div class="gate-scan-row">
+        <input type="text" id="tagInput" class="form-input" placeholder="e.g. RFID-1001" />
+        <button type="button" class="btn" onclick="triggerScan()">Record scan</button>
+    </div>
+    <p class="muted">Simulator records the current time, Gate ID <strong>SIMULATOR</strong>, and source <strong>Manual</strong>.</p>
+</div>
+<div id="scanResult" class="notice" role="status" aria-live="polite" hidden></div>
+<div class="panel table-wrap">
+    <h2>Registered tags</h2>
+    <table class="data-table">
+        <thead><tr><th>ITS ID</th><th>Household</th><th>Tag ID</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+        @foreach (var household in Model)
+        {
+            <tr>
+                <td>@household.Id</td><td>@household.Name</td><td><code>@household.TagId</code></td><td>@household.Status</td>
+                <td><button type="button" class="btn-sm quick-scan" data-tag-id="@household.TagId">Tap tag</button></td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

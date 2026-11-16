@@ -1,0 +1,27 @@
+@model RoleActivityViewModel
+@{
+    Layout = "~/Views/Management/_Layout.cshtml";
+    ViewData["Title"] = "Role activity";
+}
+<div class="page-heading">
+    <div><h1>Activity · @Model.Role</h1><p>Role creation and permission changes.</p></div>
+    <a class="btn-sm" href="/Management/Roles">Back to roles</a>
+</div>
+<div class="panel table-wrap">
+    <table class="data-table">
+        <thead><tr><th>Timestamp</th><th>Performed by</th><th>Action</th><th>Role</th><th>Details</th></tr></thead>
+        <tbody>
+        @if (Model.Rows.Count == 0) { <tr><td colspan="5" class="empty-state">No role activity records found.</td></tr> }
+        @foreach (var row in Model.Rows)
+        {
+            <tr>
+                <td>@row.Timestamp.ToLocalTime().ToString("dd MMM yyyy HH:mm:ss")</td>
+                <td>@row.PerformedBy</td>
+                <td>@row.Action</td>
+                <td>@row.TargetItem</td>
+                <td>@(row.Reason ?? "—")</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,66 @@
+@model MenusViewModel
+@{
+    Layout = "~/Views/Management/_Layout.cshtml";
+    ViewData["Title"] = "Menus";
+    var role = Context.Session.GetString("FMB.Auth.User")?.Split('|').ElementAtOrDefault(3) ?? string.Empty;
+}
+
+<div class="page-heading">
+    <div><h1>Daily Menus</h1><p>Manage the menu published for each service date.</p></div>
+    @if (RoleAccess.Can(role, "menus", 'c'))
+    {
+        <div class="form-actions">
+            <a class="btn-sm" href="/Management/Menus/BulkSchedule">Schedule date range</a>
+            <a class="btn" href="/Management/Menus/Create">+ Add menu</a>
+        </div>
+    }
+</div>
+@if (!string.IsNullOrWhiteSpace(Model.Message)) { <div class="notice">@Model.Message</div> }
+<section class="panel filter-panel">
+    <form method="get" action="/Management/Menus" class="filter-form">
+        <label>Search<input name="search" value="@Model.Search" placeholder="Search menu..." /></label>
+        <label>Menu<select name="menu"><option value="">All menus</option>@foreach (var value in Model.MenuNames) { <option value="@value" selected="@(value == Model.MenuFilter)">@value</option> }</select></label>
+        <label>Date<input type="date" name="date" value="@Model.SelectedDate?.ToString("yyyy-MM-dd")" /></label>
+        <button class="btn" type="submit">Apply filters</button>
+        <a class="btn-sm" href="/Management/Menus">Clear</a>
+        @if (RoleAccess.Can(role, "menus", 'x')) { <a class="btn-sm" href="@Url.Action("ExportMenus", new { search = Model.Search, menu = Model.MenuFilter, date = Model.SelectedDate?.ToString("yyyy-MM-dd") })">Export CSV</a> }
+    </form>
+</section>
+<div class="panel table-wrap">
+    <div class="table-toolbar"><strong>@Model.Rows.Count menu(s)</strong><span>Menu entries are unique by date.</span></div>
+    <table class="data-table">
+        <thead><tr><th>Date</th><th>Menu</th><th>Actions</th></tr></thead>
+        <tbody>
+        @if (Model.Rows.Count == 0) { <tr><td colspan="3" class="empty-state">No menus match these filters.</td></tr> }
+        @foreach (var row in Model.Rows)
+        {
+            <tr>
+                <td>@row.Date.ToString("dd MMM yyyy")</td><td><strong>@row.MenuName</strong></td>
+                <td class="action-cell">
+                    <button class="btn-sm" type="button" data-menu-view data-date="@row.Date.ToString("dd MMM yyyy")" data-menu="@row.MenuName">View</button>
+                    @if (RoleAccess.Can(role, "menus", 'e')) { <a class="btn-sm" href="/Management/Menus/@row.Date.ToString("yyyy-MM-dd")/Edit">Edit</a> }
+                    @if (RoleAccess.Can(role, "expenses", 'v')) { <a class="btn-sm" href="/Management/Expenses?date=@row.Date.ToString("yyyy-MM-dd")">Expenses</a> }
+                    @if (RoleAccess.Can(role, "feedback", 'v')) { <a class="btn-sm" href="/Management/Feedback?date=@row.Date.ToString("yyyy-MM-dd")">Feedback</a> }
+                    @if (RoleAccess.Can(role, "reconciliation", 'v')) { <a class="btn-sm" href="/Management/Reconciliation">Tiffin tracker</a> }
+                    @if (RoleAccess.Can(role, "audit", 'v')) { <a class="btn-sm" href="/Management/AuditLogs?search=@Uri.EscapeDataString(row.Date.ToString("yyyy-MM-dd"))">Logs</a> }
+                    @if (RoleAccess.Can(role, "menus", 'd'))
+                    {
+                        <form method="post" action="/Management/Menus/@row.Date.ToString("yyyy-MM-dd")/Delete" onsubmit="return confirm('Delete this menu?');">
+                            @Html.AntiForgeryToken()
+                            <button class="btn-sm btn-danger" type="submit">Delete</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+<div class="modal-backdrop" id="menu-view-modal" hidden>
+    <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="menu-view-title">
+        <button class="modal-close" type="button" data-modal-close aria-label="Close">×</button>
+        <h2 id="menu-view-title">Menu details</h2>
+        <dl class="detail-grid"><dt>Date</dt><dd data-menu-date></dd><dt>Menu</dt><dd data-menu-name></dd></dl>
+        <button class="btn-sm" type="button" data-modal-close>Close</button>
+    </section>
+</div>

@@ -1,0 +1,64 @@
+@model FMB.WebMVC.Controllers.AnalyticsViewModel
+@{
+    Layout = "~/Views/Management/_Layout.cshtml";
+    ViewData["Title"] = "Analytics & Reports";
+}
+
+<div class="page-heading">
+    <div><h1>Analytics &amp; Reports</h1><p>Collection performance, zone trends, and distributor reconciliation.</p></div>
+</div>
+<form action="/Management/Analytics" method="get" class="panel filter-panel">
+    <div class="filter-grid">
+        <div><label for="startDate">From</label><input id="startDate" name="startDate" type="date" value="@Model.StartDate.ToString("yyyy-MM-dd")" class="form-input" /></div>
+        <div><label for="endDate">To</label><input id="endDate" name="endDate" type="date" value="@Model.EndDate.ToString("yyyy-MM-dd")" class="form-input" /></div>
+        <div><label for="zone">Zone</label><select id="zone" name="zone" class="form-input"><option value="">All zones</option>@foreach (var item in Model.Zones){<option value="@item" selected="@(Model.Zone == item)">@item</option>}</select></div>
+        <div><label for="status">Status</label><select id="status" name="status" class="form-input"><option value="">All statuses</option>@foreach (var item in new[] { "Collected", "Not Collected", "On Hold" }){<option value="@item" selected="@(Model.Status == item)">@item</option>}</select></div>
+        <div><label for="entryType">Entry type</label><select id="entryType" name="entryType" class="form-input"><option value="">Auto &amp; manual</option><option value="Auto" selected="@(Model.EntryType == "Auto")">Auto</option><option value="Manual" selected="@(Model.EntryType == "Manual")">Manual</option></select></div>
+        <div class="filter-submit"><button type="submit" class="btn">Apply filters</button></div>
+    </div>
+</form>
+@if (!string.IsNullOrWhiteSpace(Model.Message))
+{
+    <div class="notice">@Model.Message</div>
+}
+else
+{
+    <div class="stats-grid report-stats">
+        <div class="stat-card positive"><div class="stat-value">@Model.CollectionRate%</div><div class="stat-label">Collection rate</div></div>
+        <div class="stat-card positive"><div class="stat-value">@Model.Collected</div><div class="stat-label">Collected records</div></div>
+        <div class="stat-card warning"><div class="stat-value">@Model.Expected</div><div class="stat-label">Expected active household-days</div></div>
+    </div>
+    <div class="grid-two">
+        <div class="panel table-wrap">
+            <h2>Day-wise collection trend</h2>
+            <table class="data-table"><thead><tr><th>Date</th><th>Collected</th><th>Expected</th><th>Rate</th></tr></thead>
+                <tbody>@foreach (var row in Model.DailyTrend){<tr><td>@row.Date.ToString("dd MMM yyyy")</td><td>@row.Collected</td><td>@row.Expected</td><td>@row.Rate%</td></tr>}</tbody>
+            </table>
+        </div>
+        <div class="panel table-wrap">
+            <h2>Zone comparison</h2>
+            <table class="data-table"><thead><tr><th>Zone</th><th>Collected</th><th>Expected</th><th>Rate</th></tr></thead>
+                <tbody>@foreach (var row in Model.ZoneTrends){<tr><td>@row.Zone</td><td>@row.Collected</td><td>@row.Expected</td><td>@row.Rate%</td></tr>}</tbody>
+            </table>
+        </div>
+    </div>
+    <div class="panel table-wrap report-entry-table">
+        <h2>Distributor reconciliation</h2>
+        <table class="data-table"><thead><tr><th>Distributor</th><th>Expected household-days</th><th>Collected</th><th>Missing</th></tr></thead>
+        <tbody>@foreach (var row in Model.DistributorTrends){<tr><td>@row.Name</td><td>@row.Expected</td><td>@row.Collected</td><td>@(row.Expected - row.Collected)</td></tr>}</tbody>
+        </table>
+        <p class="muted">Expected and collected totals are household-days in the selected date range.</p>
+    </div>
+    <div class="panel table-wrap">
+        <h2>Month / year trend</h2>
+        <table class="data-table"><thead><tr><th>Period</th><th>Collected</th><th>Expected</th><th>Rate</th></tr></thead>
+            <tbody>@foreach (var row in Model.MonthlyTrend){<tr><td>@row.Period</td><td>@row.Collected</td><td>@row.Expected</td><td>@row.Rate%</td></tr>}</tbody>
+        </table>
+    </div>
+    <div class="panel table-wrap report-entry-table">
+        <h2>Matching household records <span class="muted">(up to 200 rows)</span></h2>
+        <table class="data-table"><thead><tr><th>Date</th><th>ITS ID</th><th>Household</th><th>Zone</th><th>Status</th><th>Entry type</th></tr></thead>
+            <tbody>@foreach (var row in Model.Entries){<tr><td>@row.Date.ToString("dd MMM yyyy")</td><td>@row.HouseholdId</td><td>@row.Name</td><td>@row.Zone</td><td>@row.Status</td><td>@(row.EntryType ?? "—")</td></tr>}</tbody>
+        </table>
+    </div>
+}

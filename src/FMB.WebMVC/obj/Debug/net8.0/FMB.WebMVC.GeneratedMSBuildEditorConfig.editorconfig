@@ -1,0 +1,187 @@
+is_global = true
+build_property.TargetFramework = net8.0
+build_property.TargetFrameworkIdentifier = .NETCoreApp
+build_property.TargetFrameworkVersion = v8.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = FMB.WebMVC
+build_property.RootNamespace = FMB.WebMVC
+build_property.ProjectDir = C:\Users\SURFACE\Downloads\FMB.TiffinTracker\FMB.TiffinTracker\src\FMB.WebMVC\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 8.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = C:\Users\SURFACE\Downloads\FMB.TiffinTracker\FMB.TiffinTracker\src\FMB.WebMVC
+build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 8.0
+build_property.EnableCodeStyleSeverity = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Feedback/Submit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmVlZGJhY2tcU3VibWl0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Feedback/Submitted.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmVlZGJhY2tcU3VibWl0dGVkLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Home/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxFcnJvci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Home/HouseholdPortal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxIb3VzZWhvbGRQb3J0YWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Home/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Home/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxMb2dpbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Home/StaffDashboard.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxTdGFmZkRhc2hib2FyZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Home/StaffOperationsDashboard.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxTdGFmZk9wZXJhdGlvbnNEYXNoYm9hcmQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Home/_AuditPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxfQXVkaXRQYXJ0aWFsLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Home/_DashboardPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxfRGFzaGJvYXJkUGFydGlhbC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Home/_GatePartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxfR2F0ZVBhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Home/_HouseholdsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxfSG91c2Vob2xkc1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Management/Analytics.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFuYWdlbWVudFxBbmFseXRpY3MuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Management/DistributorForm.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFuYWdlbWVudFxEaXN0cmlidXRvckZvcm0uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Management/Distributors.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFuYWdlbWVudFxEaXN0cmlidXRvcnMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Management/Gate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFuYWdlbWVudFxHYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Management/HouseholdForm.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFuYWdlbWVudFxIb3VzZWhvbGRGb3JtLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Management/Households.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFuYWdlbWVudFxIb3VzZWhvbGRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Management/Reconciliation.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFuYWdlbWVudFxSZWNvbmNpbGlhdGlvbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Management/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFuYWdlbWVudFxfTGF5b3V0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Operations/AuditLogs.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3BlcmF0aW9uc1xBdWRpdExvZ3MuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Operations/BulkMenuSchedule.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3BlcmF0aW9uc1xCdWxrTWVudVNjaGVkdWxlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Operations/ExpenseForm.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3BlcmF0aW9uc1xFeHBlbnNlRm9ybS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Operations/Expenses.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3BlcmF0aW9uc1xFeHBlbnNlcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Operations/Feedback.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3BlcmF0aW9uc1xGZWVkYmFjay5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Operations/MenuForm.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3BlcmF0aW9uc1xNZW51Rm9ybS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Operations/Menus.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3BlcmF0aW9uc1xNZW51cy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Operations/Notifications.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3BlcmF0aW9uc1xOb3RpZmljYXRpb25zLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Operations/Queries.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3BlcmF0aW9uc1xRdWVyaWVzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Operations/QueryForm.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3BlcmF0aW9uc1xRdWVyeUZvcm0uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Operations/QueryReplyForm.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3BlcmF0aW9uc1xRdWVyeVJlcGx5Rm9ybS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Operations/RoleActivity.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3BlcmF0aW9uc1xSb2xlQWN0aXZpdHkuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Operations/RoleDetails.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3BlcmF0aW9uc1xSb2xlRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Operations/RoleForm.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3BlcmF0aW9uc1xSb2xlRm9ybS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Operations/Roles.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3BlcmF0aW9uc1xSb2xlcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Operations/UserActivity.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3BlcmF0aW9uc1xVc2VyQWN0aXZpdHkuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Operations/UserForm.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3BlcmF0aW9uc1xVc2VyRm9ybS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Operations/Users.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3BlcmF0aW9uc1xVc2Vycy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/Shared/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/SURFACE/Downloads/FMB.TiffinTracker/FMB.TiffinTracker/src/FMB.WebMVC/Views/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 

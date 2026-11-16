@@ -1,0 +1,43 @@
+@model IReadOnlyList<FMB.Domain.Entities.Distributor>
+@{
+    Layout = "~/Views/Management/_Layout.cshtml";
+    ViewData["Title"] = "Distributors";
+    var role = Context.Session.GetString("FMB.Auth.User")?.Split('|').ElementAtOrDefault(3) ?? string.Empty;
+}
+
+<div class="page-heading">
+    <div><h1>Distributor Master</h1><p>Maintain contacts and bulk collection assignments.</p></div>
+    @if (RoleAccess.Can(role, "distributors", 'c')) { <a class="btn" href="/Management/CreateDistributor">Add distributor</a> }
+</div>
+@if (TempData["Message"] is string message)
+{
+    <div class="notice">@message</div>
+}
+<div class="panel table-wrap">
+    <table class="data-table">
+        <thead><tr><th>Distributor ID</th><th>Name</th><th>Phone</th><th>Status</th><th>Assigned households</th><th>Actions</th></tr></thead>
+        <tbody>
+        @foreach (var distributor in Model)
+        {
+            <tr>
+                <td>@distributor.Id</td>
+                <td>@distributor.Name</td>
+                <td>@distributor.Phone</td>
+                <td><span class="status-chip">@distributor.Status</span></td>
+                <td>@distributor.Households.Count</td>
+                <td class="action-cell">
+                    @if (RoleAccess.Can(role, "distributors", 'e')) { <a class="btn-sm" href="/Management/EditDistributor?id=@Uri.EscapeDataString(distributor.Id)">Edit</a> }
+                    @if (RoleAccess.Can(role, "distributors", 'd'))
+                    {
+                        <form action="/Management/DeleteDistributor" method="post" onsubmit="return confirm('Delete this distributor?');">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@distributor.Id" />
+                            <button class="btn-sm btn-danger" type="submit">Delete</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

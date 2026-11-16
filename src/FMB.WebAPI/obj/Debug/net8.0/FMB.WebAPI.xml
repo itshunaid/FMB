@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>FMB.WebAPI</name>
+    </assembly>
+    <members>
+        <member name="M:FMB.WebAPI.Controllers.GateController.ScanTag(FMB.WebAPI.Controllers.ScanRequest,System.Threading.CancellationToken)">
+            <summary>Records a gate scan and returns the household collection result.</summary>
+        </member>
+        <member name="M:FMB.WebAPI.Controllers.GateController.GetStats(System.Nullable{System.DateTimeOffset},System.Threading.CancellationToken)">
+            <summary>Returns collection statistics for the requested date, or today by default.</summary>
+        </member>
+        <member name="T:FMB.WebAPI.Controllers.ScanRequest">
+            <summary>Payload submitted by an RFID gate reader.</summary>
+        </member>
+        <member name="P:FMB.WebAPI.Controllers.ScanRequest.TagId">
+            <summary>RFID tag identifier assigned to a household.</summary>
+        </member>
+        <member name="P:FMB.WebAPI.Controllers.ScanRequest.Timestamp">
+            <summary>Timestamp reported by the reader, including its UTC offset.</summary>
+        </member>
+        <member name="P:FMB.WebAPI.Controllers.ScanRequest.GateId">
+            <summary>Identifier of the gate reader.</summary>
+        </member>
+        <member name="P:FMB.WebAPI.Controllers.ScanRequest.Source">
+            <summary>Origin of the scan, such as Auto or Manual.</summary>
+        </member>
+        <member name="T:FMB.WebAPI.Controllers.ScanResponse">
+            <summary>Outcome of processing a gate scan.</summary>
+        </member>
+        <member name="M:FMB.WebAPI.Controllers.ScanResponse.#ctor(System.Boolean,System.String,System.String,System.Nullable{System.DateTimeOffset})">
+            <summary>Outcome of processing a gate scan.</summary>
+        </member>
+        <member name="T:FMB.WebAPI.Controllers.GateStatsResponse">
+            <summary>Collection totals returned by the gate stats endpoint.</summary>
+        </member>
+        <member name="M:FMB.WebAPI.Controllers.GateStatsResponse.#ctor(System.DateTime,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.String)">
+            <summary>Collection totals returned by the gate stats endpoint.</summary>
+        </member>
+    </members>
+</doc>

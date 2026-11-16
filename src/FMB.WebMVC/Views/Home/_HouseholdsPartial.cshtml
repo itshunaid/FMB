@@ -1,0 +1,23 @@
+@model IEnumerable<FMB.Domain.Entities.Household>
+
+<h2>Households &amp; RFID Tags</h2>
+<div class="c">
+    <table>
+        <thead>
+            <tr><th>ITS ID</th><th>Name</th><th>Zone</th><th>Members</th><th>Tag ID</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var h in Model)
+            {
+                <tr>
+                    <td>@h.Id</td>
+                    <td>@h.Name</td>
+                    <td>@h.Zone</td>
+                    <td>@h.Size</td>
+                    <td><code>@h.TagId</code></td>
+                    <td>@h.Status</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

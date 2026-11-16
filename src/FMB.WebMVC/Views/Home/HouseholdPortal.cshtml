@@ -1,0 +1,102 @@
+@model FMB.WebMVC.Controllers.HouseholdPortalViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Household portal";
+}
+
+<main class="household-portal">
+    <header class="topbar">
+        <div class="topbar-date">@Model.Today.ToString("dddd, dd MMM yyyy")</div>
+        <div class="topbar-actions">
+            <span class="user-pill">Household · Thali @Model.ThaliNumber</span>
+            <button type="button" class="topbar-btn" data-theme-toggle aria-label="Toggle color theme">Dark mode</button>
+            <form asp-controller="Home" asp-action="Logout" method="post" style="margin:0;">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="topbar-btn">Logout</button>
+            </form>
+        </div>
+    </header>
+
+    <section class="household-welcome">
+        <h1>Afzalus Salam, @Model.Name</h1>
+        <p>ITS ID @Model.ItsId · @Model.Zone · Household status: @Model.Status</p>
+    </section>
+
+    <section class="stats-grid">
+        <article class="stat-card positive">
+            <div class="stat-value">@(Model.TodayMenu ?? "Menu not posted")</div>
+            <div class="stat-label">Today's menu</div>
+        </article>
+        <article class="stat-card @(Model.CollectionStatus == "Collected" ? "positive" : "warning")">
+            <div class="stat-value">@Model.CollectionStatus</div>
+            <div class="stat-label">
+                @if (Model.CollectionTime.HasValue)
+                {
+                    <span>Collected at @Model.CollectionTime.Value.ToString("HH:mm")</span>
+                }
+                else
+                {
+                    <span>Today's collection status</span>
+                }
+            </div>
+        </article>
+    </section>
+
+    @if (Model.CanSubmitFeedback)
+    {
+        <section class="panel household-section">
+            <h2>Share feedback</h2>
+            <p>Your tiffin is recorded as collected. You can submit feedback for today's menu.</p>
+            <a class="btn" href="@Model.FeedbackUrl">Give feedback</a>
+        </section>
+    }
+    else if (Model.SubmittedFeedback is not null)
+    {
+        <section class="panel household-section">
+            <h2>Feedback received</h2>
+            <p>Thank you for your feedback. Rating: @Model.SubmittedFeedback.Rating / 5 · Quantity: @Model.SubmittedFeedback.Quantity · Quality: @Model.SubmittedFeedback.Quality</p>
+            @if (!string.IsNullOrWhiteSpace(Model.SubmittedFeedback.Comment))
+            {
+                <p>@Model.SubmittedFeedback.Comment</p>
+            }
+        </section>
+    }
+
+    @if (Model.UpcomingMenus.Count > 0)
+    {
+        <section class="panel household-section">
+            <h2>Upcoming menus</h2>
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead><tr><th>Date</th><th>Menu</th></tr></thead>
+                    <tbody>
+                    @foreach (var menu in Model.UpcomingMenus)
+                    {
+                        <tr><td>@menu.Date.ToString("ddd, dd MMM")</td><td>@menu.Menu</td></tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    }
+
+    <section class="panel household-section">
+        <h2>My last 7 days</h2>
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead><tr><th>Date</th><th>Menu</th><th>Status</th><th>Collected at</th></tr></thead>
+                <tbody>
+                @foreach (var day in Model.RecentDays)
+                {
+                    <tr>
+                        <td>@day.Date.ToString("ddd, dd MMM")</td>
+                        <td>@day.Menu</td>
+                        <td>@day.Status</td>
+                        <td>@(day.CollectionTime?.ToString("HH:mm") ?? "—")</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>

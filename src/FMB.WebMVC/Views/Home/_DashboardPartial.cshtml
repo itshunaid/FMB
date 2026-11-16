@@ -1,0 +1,18 @@
+@model FMB.Application.Queries.DashboardStatsDto
+
+<h2>Dashboard — @DateTime.Today.ToString("yyyy-MM-dd")</h2>
+<div class="g">
+    <div class="c k"><b>@Model.Collected</b><span>Collected</span></div>
+    <div class="c k"><b>@Model.Pending</b><span>Pending</span></div>
+    <div class="c k"><b>@Model.OnHold</b><span>On hold</span></div>
+    <div class="c k"><b>@Model.CollectionRatePercent%</b><span>Collection rate</span></div>
+</div>
+<div class="c" style="margin-bottom:14px">
+    <h3>Today's Menu</h3>
+    <p><b>@Model.TodayMenu</b></p>
+</div>
+<div class="c" style="margin-bottom:14px">
+    <h3>Today's Live Distribution Progress</h3>
+    <div class="pg"><i style="width:@(Model.CollectionRatePercent)%"></i></div>
+    <p class="mu">Distribution window: <b>Open</b> · Gateway status: <b style="color:var(--ok)">Online (SQL Server Connected)</b></p>
+</div>

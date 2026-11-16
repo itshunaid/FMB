@@ -1,0 +1,112 @@
+@model FeedbackViewModel
+@{
+    Layout = "~/Views/Management/_Layout.cshtml";
+    ViewData["Title"] = "Feedback";
+    var role = Context.Session.GetString("FMB.Auth.User")?.Split('|').ElementAtOrDefault(3) ?? string.Empty;
+}
+<div class="page-heading">
+    <div><h1>Member Feedback</h1><p>Collect and review feedback about the daily menu.</p></div>
+    <div class="heading-actions">
+        <button class="btn-sm" type="button" data-modal-open="share-feedback-modal">Share feedback form</button>
+        <button class="btn" type="button" data-modal-open="submit-feedback-modal">+ Add feedback</button>
+    </div>
+</div>
+@if (!string.IsNullOrWhiteSpace(Model.Message)) { <div class="notice">@Model.Message</div> }
+<section class="panel feedback-invite">
+    <div><strong>Feedback form · @Model.FormDate.ToString("dd MMM yyyy")</strong><span>@(string.IsNullOrWhiteSpace(Model.FormMenuName) ? "No menu has been set for this date." : Model.FormMenuName)</span></div>
+    <a class="btn-sm" href="@Model.FeedbackUrl" target="_blank" rel="noopener">Open public form</a>
+</section>
+<section class="panel filter-panel">
+    <form method="get" action="/Management/Feedback" class="filter-form">
+        <label>Search<input name="search" value="@Model.Search" placeholder="Member, ITS ID or comment..." /></label>
+        <label>Menu<select name="menu"><option value="">All menus</option>@foreach (var value in Model.MenuNames) { <option value="@value" selected="@(value == Model.MenuFilter)">@value</option> }</select></label>
+        <label>Zone<select name="zone"><option value="">All zones</option>@foreach (var value in Model.Zones) { <option value="@value" selected="@(value == Model.ZoneFilter)">@value</option> }</select></label>
+        <label>Rating<select name="rating"><option value="">Any rating</option>@for (var value = 5; value >= 1; value--) { <option value="@value" selected="@(value == Model.RatingFilter)">@value stars</option> }</select></label>
+        <label>Quantity<select name="quantity"><option value="">Any</option>@foreach (var value in new[] { "Right", "Less", "More" }) { <option value="@value" selected="@(value == Model.QuantityFilter)">@value</option> }</select></label>
+        <label>Quality<select name="quality"><option value="">Any</option>@foreach (var value in new[] { "Excellent", "Good", "Average", "Poor" }) { <option value="@value" selected="@(value == Model.QualityFilter)">@value</option> }</select></label>
+        <label>From<input type="date" name="fromDate" value="@Model.FromDate?.ToString("yyyy-MM-dd")" /></label>
+        <label>To<input type="date" name="toDate" value="@Model.ToDate?.ToString("yyyy-MM-dd")" /></label>
+        <button class="btn" type="submit">Apply filters</button>
+        <a class="btn-sm" href="/Management/Feedback">Clear</a>
+        @if (RoleAccess.Can(role, "feedback", 'x')) { <a class="btn-sm" href="@Url.Action("ExportFeedback", new { search = Model.Search, menu = Model.MenuFilter, zone = Model.ZoneFilter, rating = Model.RatingFilter, quantity = Model.QuantityFilter, quality = Model.QualityFilter, fromDate = Model.FromDate?.ToString("yyyy-MM-dd"), toDate = Model.ToDate?.ToString("yyyy-MM-dd") })">Export CSV</a> }
+    </form>
+</section>
+<div class="panel table-wrap">
+    <div class="table-toolbar"><strong>@Model.Rows.Count feedback response(s)</strong><span>Latest entries first; export is limited to 1,000 responses.</span></div>
+    <table class="data-table">
+        <thead><tr><th>Date / Menu</th><th>Member</th><th>Zone</th><th>Rating</th><th>Quantity</th><th>Quality</th><th>Comment</th><th>Actions</th></tr></thead>
+        <tbody>
+        @if (Model.Rows.Count == 0) { <tr><td colspan="8" class="empty-state">No feedback matches these filters.</td></tr> }
+        @foreach (var row in Model.Rows)
+        {
+            <tr>
+                <td>@row.Date.ToString("dd MMM yyyy")<br /><span class="muted">@row.MenuName</span></td>
+                <td><strong>@row.MemberName</strong><br /><span class="muted">@row.ItsId</span></td>
+                <td>@row.Zone</td>
+                <td><span class="rating-stars" aria-label="@row.Rating out of 5">@string.Concat(Enumerable.Repeat("★", row.Rating))@string.Concat(Enumerable.Repeat("☆", 5 - row.Rating))</span></td>
+                <td>@row.Quantity</td><td>@row.Quality</td>
+                <td class="comment-cell">@(string.IsNullOrWhiteSpace(row.Comment) ? "—" : row.Comment)</td>
+                <td class="action-cell">
+                    <button class="btn-sm" type="button" data-feedback-view data-member="@row.MemberName" data-its="@row.ItsId" data-date="@row.Date.ToString("dd MMM yyyy")" data-menu="@row.MenuName" data-zone="@row.Zone" data-rating="@row.Rating" data-quantity="@row.Quantity" data-quality="@row.Quality" data-comment="@row.Comment">View</button>
+                    @if (RoleAccess.Can(role, "feedback", 'd'))
+                    {
+                        <form method="post" action="/Management/Feedback/@row.Id/Delete" onsubmit="return confirm('Delete this feedback response?');">
+                            @Html.AntiForgeryToken()<button class="btn-sm btn-danger" type="submit">Delete</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+<div class="modal-backdrop" id="share-feedback-modal" hidden>
+    <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="share-modal-title">
+        <button class="modal-close" type="button" data-modal-close aria-label="Close">×</button>
+        <h2 id="share-modal-title">Share feedback form</h2>
+        <p>Invite members to rate the menu for @Model.FormDate.ToString("dd MMM yyyy").</p>
+        <label class="modal-field">Public link<input id="feedback-link" readonly value="@Model.FeedbackUrl" /></label>
+        <div class="form-actions">
+            <a class="btn" id="whatsapp-share" href="https://wa.me/?text=@Uri.EscapeDataString($"FMB Tiffin feedback form: {Model.FeedbackUrl}")" target="_blank" rel="noopener">Share on WhatsApp</a>
+            <button type="button" class="btn-sm" data-copy-link>Copy link</button>
+            <button type="button" class="btn-sm" data-modal-close>Close</button>
+        </div>
+    </section>
+</div>
+
+@if (RoleAccess.Can(role, "feedback", 'c'))
+{
+<div class="modal-backdrop" id="submit-feedback-modal" hidden>
+    <section class="modal-card modal-wide" role="dialog" aria-modal="true" aria-labelledby="submit-modal-title">
+        <button class="modal-close" type="button" data-modal-close aria-label="Close">×</button>
+        <h2 id="submit-modal-title">Submit member feedback</h2>
+        <p>Enter feedback using a registered ITS ID. Member and zone details are looked up automatically.</p>
+        <form method="post" action="/Feedback/Submit" class="form-grid modal-form">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="Date" value="@Model.FormDate.ToString("yyyy-MM-dd")" />
+            <input type="hidden" name="MenuName" value="@Model.FormMenuName" />
+            <label>ITS ID<input name="ItsId" inputmode="numeric" pattern="[0-9]{6,20}" required /></label>
+            <label>Rating<select name="Rating" required><option value="5">5 — Excellent</option><option value="4">4 — Good</option><option value="3">3 — Average</option><option value="2">2 — Poor</option><option value="1">1 — Very poor</option></select></label>
+            <label>Quantity<select name="Quantity" required><option>Right</option><option>Less</option><option>More</option></select></label>
+            <label>Food quality<select name="Quality" required><option>Excellent</option><option>Good</option><option>Average</option><option>Poor</option></select></label>
+            <label class="form-span">Comment<textarea name="Comment" rows="3" maxlength="1000"></textarea></label>
+            <div class="form-actions form-span"><button class="btn" type="submit">Submit feedback</button><button class="btn-sm" type="button" data-modal-close>Cancel</button></div>
+        </form>
+    </section>
+</div>
+}
+
+<div class="modal-backdrop" id="feedback-view-modal" hidden>
+    <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="feedback-view-title">
+        <button class="modal-close" type="button" data-modal-close aria-label="Close">×</button>
+        <h2 id="feedback-view-title">Feedback response</h2>
+        <dl class="detail-grid">
+            <dt>Member</dt><dd data-view-member></dd><dt>ITS ID</dt><dd data-view-its></dd>
+            <dt>Date / Menu</dt><dd data-view-date></dd><dt>Zone</dt><dd data-view-zone></dd>
+            <dt>Rating</dt><dd data-view-rating></dd><dt>Quantity</dt><dd data-view-quantity></dd>
+            <dt>Quality</dt><dd data-view-quality></dd><dt>Comment</dt><dd data-view-comment></dd>
+        </dl>
+        <button class="btn-sm" type="button" data-modal-close>Close</button>
+    </section>
+</div>

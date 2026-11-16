@@ -1,0 +1,42 @@
+@model AuditLogsViewModel
+@{
+    Layout = "~/Views/Management/_Layout.cshtml";
+    ViewData["Title"] = "Audit logs";
+}
+<div class="page-heading"><div><h1>Audit Logs</h1><p>Track data changes, user actions and deletion reasons.</p></div></div>
+<section class="panel filter-panel">
+    <form method="get" action="/Management/AuditLogs" class="filter-form">
+        <label>Search<input name="search" value="@Model.Search" placeholder="Target or reason..." /></label>
+        <label>Performed by<select name="performedBy"><option value="">Everyone</option>@foreach (var value in Model.Performers) { <option value="@value" selected="@(value == Model.PerformedBy)">@value</option> }</select></label>
+        <label>Action<select name="action"><option value="">All actions</option>@foreach (var value in Model.Actions) { <option value="@value" selected="@(value == Model.ActionFilter)">@value</option> }</select></label>
+        <label>Area<select name="table"><option value="">All areas</option>@foreach (var value in Model.Tables) { <option value="@value" selected="@(value == Model.TableFilter)">@value</option> }</select></label>
+        <button class="btn" type="submit">Apply filters</button><a class="btn-sm" href="/Management/AuditLogs">Clear</a>
+        <a class="btn-sm" href="@Url.Action("ExportAuditLogs", new { search = Model.Search, performedBy = Model.PerformedBy, action = Model.ActionFilter, table = Model.TableFilter })">Export CSV</a>
+    </form>
+</section>
+<div class="panel table-wrap">
+    <div class="table-toolbar"><strong>Latest activity</strong><span>Showing up to 1,000 records</span></div>
+    <table class="data-table">
+        <thead><tr><th>Timestamp</th><th>Performed by</th><th>Action</th><th>Target</th><th>Area</th><th>Reason</th></tr></thead>
+        <tbody>
+        @if (Model.Rows.Count == 0) { <tr><td colspan="6" class="empty-state">No audit entries match these filters.</td></tr> }
+        @foreach (var row in Model.Rows)
+        {
+            <tr><td>@row.Timestamp.ToLocalTime().ToString("dd MMM yyyy HH:mm:ss")</td><td>@row.PerformedBy</td><td>@row.Action</td><td>@row.TargetItem</td><td>@row.TableName</td><td>@(row.Reason ?? "—")</td></tr>
+        }
+        </tbody>
+    </table>
+</div>
+<div class="page-heading section-heading"><div><h2>Deleted records &amp; reasons</h2><p>Latest deletions for review.</p></div></div>
+<div class="panel table-wrap">
+    <table class="data-table">
+        <thead><tr><th>Timestamp</th><th>Performed by</th><th>Record</th><th>Area</th><th>Reason</th></tr></thead>
+        <tbody>
+        @if (Model.DeletedRows.Count == 0) { <tr><td colspan="5" class="empty-state">No deleted records found.</td></tr> }
+        @foreach (var row in Model.DeletedRows)
+        {
+            <tr><td>@row.Timestamp.ToLocalTime().ToString("dd MMM yyyy HH:mm:ss")</td><td>@row.PerformedBy</td><td>@row.TargetItem</td><td>@row.TableName</td><td>@(row.Reason ?? "—")</td></tr>
+        }
+        </tbody>
+    </table>
+</div>

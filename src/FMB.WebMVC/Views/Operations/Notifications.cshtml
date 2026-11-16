@@ -1,0 +1,46 @@
+@model NotificationsViewModel
+@{
+    Layout = "~/Views/Management/_Layout.cshtml";
+    ViewData["Title"] = "Notifications";
+}
+
+<div class="page-heading">
+    <div><h1>Notifications</h1><p>Important alerts recorded by gate scans.</p></div>
+</div>
+<section class="panel filter-panel">
+    <form method="get" action="/Management/Notifications" class="filter-form">
+        <label>Search<input name="search" value="@Model.Search" placeholder="Search alerts..." /></label>
+        <label>Type
+            <select name="type">
+                <option value="">All types</option>
+                @foreach (var value in Model.Types)
+                {
+                    <option value="@value" selected="@(value == Model.TypeFilter)">@value</option>
+                }
+            </select>
+        </label>
+        <label>Date<input type="date" name="date" value="@Model.SelectedDate?.ToString("yyyy-MM-dd")" /></label>
+        <button class="btn" type="submit">Apply filters</button>
+        <a class="btn-sm" href="/Management/Notifications">Clear</a>
+        <span class="muted">@Model.Rows.Count alert(s)</span>
+    </form>
+</section>
+<div class="panel table-wrap">
+    <table class="data-table">
+        <thead><tr><th>Time</th><th>Type</th><th>Message</th></tr></thead>
+        <tbody>
+        @if (Model.Rows.Count == 0)
+        {
+            <tr><td colspan="3" class="empty-state">No alerts match these filters.</td></tr>
+        }
+        @foreach (var row in Model.Rows)
+        {
+            <tr>
+                <td>@row.Timestamp.ToLocalTime().ToString("dd-MMM-yyyy HH:mm")</td>
+                <td><span class="status-chip">@row.Type</span></td>
+                <td>@row.Message</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,89 @@
+@model FMB.WebMVC.Controllers.ReconciliationViewModel
+@{
+    Layout = "~/Views/Management/_Layout.cshtml";
+    ViewData["Title"] = "Daily Reconciliation";
+    var role = Context.Session.GetString("FMB.Auth.User")?.Split('|').ElementAtOrDefault(3) ?? string.Empty;
+}
+
+<div class="page-heading">
+    <div><h1>Daily Reconciliation</h1><p>@Model.Date.ToString("dddd, dd MMMM yyyy") · Review all household collection statuses.</p></div>
+    <span class="status-chip">@Model.Rows.Count(row => row.Status == "Collected") / @Model.Rows.Count(row => row.Status != "On Hold") collected</span>
+</div>
+@if (!string.IsNullOrWhiteSpace(Model.Message))
+{
+    <div class="notice">@Model.Message</div>
+}
+<section class="panel">
+    <div class="table-toolbar">
+        <strong>Distribution window: @(Model.DayFinalized ? "Finalized" : Model.WindowClosed ? "Closed" : "Open")</strong>
+        <span>@(Model.HasMenu ? "Menu published for this date." : "No menu is published for this date.")</span>
+    </div>
+    @if (RoleAccess.Can(role, "reconciliation", 'e'))
+    {
+        <div class="action-cell">
+            @if (!Model.WindowClosed && !Model.DayFinalized)
+            {
+                <form asp-action="CloseWindow" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="date" value="@Model.Date.ToString("yyyy-MM-dd")" />
+                    <button class="btn-sm" type="submit" disabled="@(!Model.HasMenu)">Close distribution window</button>
+                </form>
+            }
+            @if (Model.WindowClosed && !Model.DayFinalized)
+            {
+                <form asp-action="FinalizeDay" method="post" onsubmit="return confirm('Finalize this day? Collection records will be locked.');">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="date" value="@Model.Date.ToString("yyyy-MM-dd")" />
+                    <button class="btn-sm btn-danger" type="submit">Finalize day</button>
+                </form>
+            }
+        </div>
+    }
+</section>
+<section class="panel filter-panel">
+    <form method="get" action="/Management/Reconciliation" class="filter-form">
+        <label>Date<input type="date" name="date" value="@Model.Date.ToString("yyyy-MM-dd")" /></label>
+        <label>Search<input name="search" value="@Model.Search" placeholder="ITS ID, name or RFID..." /></label>
+        <label>Zone<select name="zone"><option value="">All zones</option>@foreach (var value in Model.Zones) { <option value="@value" selected="@(value == Model.Zone)">@value</option> }</select></label>
+        <label>Status<select name="status"><option value="">All statuses</option>@foreach (var value in new[] { "Collected", "Not Collected", "Pending", "On Hold" }) { <option value="@value" selected="@(value == Model.StatusFilter)">@value</option> }</select></label>
+        <button class="btn" type="submit">Apply filters</button>
+        <a class="btn-sm" href="/Management/Reconciliation">Today</a>
+        @if (RoleAccess.Can(role, "reconciliation", 'x')) { <a class="btn-sm" href="@Url.Action("ExportReconciliation", "Operations", new { date = Model.Date.ToString("yyyy-MM-dd"), search = Model.Search, zone = Model.Zone, status = Model.StatusFilter })">Export CSV</a> }
+    </form>
+</section>
+<div class="panel table-wrap">
+    <div class="table-toolbar"><strong>@Model.Rows.Count household(s)</strong><span>Manual collection is available until the day is finalized.</span></div>
+    <table class="data-table">
+        <thead><tr><th>ITS ID</th><th>Household</th><th>Zone</th><th>RFID Tag</th><th>Status</th><th>Entry type</th><th>Scan time</th><th>Manual collection</th></tr></thead>
+        <tbody>
+        @if (Model.Rows.Count == 0) { <tr><td colspan="8" class="empty-state">No households match these filters.</td></tr> }
+        @foreach (var row in Model.Rows)
+        {
+            <tr>
+                <td>@row.HouseholdId</td>
+                <td>@row.Name</td>
+                <td>@row.Zone</td>
+                <td><code>@row.TagId</code></td>
+                <td><span class="status-chip status-@row.Status.Replace(" ", "-", StringComparison.Ordinal).ToLowerInvariant()">@row.Status</span></td>
+                <td>@(row.EntryType is null ? "—" : row.EntryType.Equals("manual", StringComparison.OrdinalIgnoreCase) ? "Manual" : "Auto")</td>
+                <td>@(row.ScanTime?.ToLocalTime().ToString("HH:mm:ss") ?? "—")</td>
+                <td>
+                    @if ((row.Status == "Not Collected" || row.Status == "Pending") && Model.Date == DateTime.Today && !Model.DayFinalized)
+                    {
+                        <form asp-action="MarkCollected" method="post" class="inline-collection-form">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="HouseholdId" value="@row.HouseholdId" />
+                            <input type="text" name="Reason" maxlength="500" required minlength="3" placeholder="Reason required" aria-label="Reason for manual collection" />
+                            <button type="submit" class="btn-sm">Mark collected</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <span class="muted">—</span>
+                    }
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,18 @@
+@model UserActivityViewModel
+@{
+    Layout = "~/Views/Management/_Layout.cshtml";
+    ViewData["Title"] = "User activity";
+}
+<div class="page-heading"><div><h1>Activity · @Model.User.Name</h1><p>@Model.User.ItsId · @Model.User.Role</p></div><a class="btn-sm" href="/Management/Users">Back to users</a></div>
+<div class="panel table-wrap">
+    <table class="data-table">
+        <thead><tr><th>Timestamp</th><th>Action</th><th>Target</th><th>Area</th><th>Reason / details</th></tr></thead>
+        <tbody>
+        @if (Model.Logs.Count == 0) { <tr><td colspan="5" class="empty-state">No activity records found.</td></tr> }
+        @foreach (var row in Model.Logs)
+        {
+            <tr><td>@row.Timestamp.ToLocalTime().ToString("dd MMM yyyy HH:mm:ss")</td><td>@row.Action</td><td>@row.TargetItem</td><td>@row.TableName</td><td>@(row.Reason ?? "—")</td></tr>
+        }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,30 @@
+@model IEnumerable<FMB.Domain.Entities.Household>
+
+<h2>RFID Gate Simulator</h2>
+<div class="c" style="margin-bottom:14px">
+    <h3>Simulate RFID Tag Scan</h3>
+    <div style="display:flex;gap:10px;margin-top:10px;">
+        <input type="text" id="tagInput" placeholder="Enter RFID Tag ID (e.g. RFID-1001)" class="inp" />
+        <button onclick="triggerScan()" class="btn">Scan Tag</button>
+    </div>
+</div>
+<div class="c">
+    <h3>Quick Test Registered Tags</h3>
+    <table>
+        <thead>
+            <tr><th>ITS ID</th><th>Household</th><th>Tag ID</th><th>Status</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var h in Model)
+            {
+                <tr>
+                    <td>@h.Id</td>
+                    <td>@h.Name</td>
+                    <td><code>@h.TagId</code></td>
+                    <td>@h.Status</td>
+                    <td><button class="btn-sm" onclick="quickScan('@h.TagId')">Tap Card</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

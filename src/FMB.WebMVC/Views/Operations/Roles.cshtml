@@ -1,0 +1,60 @@
+@model RolesViewModel
+@using FMB.WebMVC.Services
+@{
+    Layout = "~/Views/Management/_Layout.cshtml";
+    ViewData["Title"] = "Roles & Permissions";
+}
+
+<div class="page-heading">
+    <div>
+        <h1>Roles &amp; Permissions</h1>
+        <p>Decide who can see and do what.</p>
+        <p>Create roles, set module permissions and dashboard widgets, then assign roles to users.</p>
+    </div>
+</div>
+@if (!string.IsNullOrWhiteSpace(Model.Message)) { <div class="notice">@Model.Message</div> }
+<div class="role-toolbar">
+    <form method="get" action="/Management/Roles" class="filter-form">
+        <input aria-label="Search roles" name="search" value="@Model.Search" placeholder="Search..." />
+        <button class="btn-sm" type="submit">Search</button>
+        @if (!string.IsNullOrWhiteSpace(Model.Search)) { <a class="btn-sm" href="/Management/Roles">Clear</a> }
+    </form>
+    @if (Model.CanManageRoles) { <a class="btn" href="/Management/Roles/Create">+ Add role</a> }
+    <span class="muted">@Model.Rows.Count of @Model.TotalRoles</span>
+</div>
+<div class="panel table-wrap">
+    <table class="data-table">
+        <thead><tr><th>Role</th><th>Users</th><th>Modules</th><th>Widgets</th><th>Actions</th></tr></thead>
+        <tbody>
+        @if (Model.Rows.Count == 0) { <tr><td colspan="5" class="empty-state">No roles match this search.</td></tr> }
+        @foreach (var role in Model.Rows)
+        {
+            <tr>
+                <td>@role.Role</td>
+                <td>@role.AssignedUsers</td>
+                <td>@RoleAccess.Modules.Count(module => role.Permissions.ContainsKey(module.Key) && role.Permissions[module.Key].Length > 0)</td>
+                <td>@role.DashboardWidgetCount</td>
+                <td class="action-cell">
+                    <a class="btn-sm" href="/Management/Roles/@Uri.EscapeDataString(role.Role)/View">View</a>
+                    @if (Model.CanManageRoles && role.Role != "Admin")
+                    {
+                        <a class="btn-sm" href="/Management/Roles/@Uri.EscapeDataString(role.Role)/Edit">Edit</a>
+                        <form method="post" action="/Management/Roles/@Uri.EscapeDataString(role.Role)/Delete"
+                              onsubmit="return confirm('Delete this role? Roles assigned to users cannot be deleted.');">
+                            @Html.AntiForgeryToken()
+                            <button class="btn-sm btn-danger" type="submit"
+                                    disabled="@(role.IsBuiltIn || role.AssignedUsers > 0)"
+                                    title="@(role.IsBuiltIn ? "Built-in roles cannot be deleted." : role.AssignedUsers > 0 ? "Unassign this role before deleting it." : "Delete this role.")">Delete</button>
+                        </form>
+                    }
+                    else if (Model.CanManageRoles)
+                    {
+                        <button class="btn-sm btn-danger" type="button" disabled title="The Admin role is protected.">Delete</button>
+                    }
+                    @if (Model.CanManageRoles) { <a class="btn-sm" href="/Management/Roles/@Uri.EscapeDataString(role.Role)/Activity">Activity logs</a> }
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

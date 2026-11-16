@@ -1,0 +1,185 @@
+@model FMB.WebMVC.Controllers.DashboardViewModel
+@using System.Globalization
+@using FMB.WebMVC.Services
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Dashboard";
+    var inr = new CultureInfo("en-IN");
+    var sessionUser = Context.Session.GetString("FMB.Auth.User");
+    var role = sessionUser?.Split('|').ElementAtOrDefault(3) ?? string.Empty;
+}
+
+<div class="app-shell">
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="sidebar-logo">✦</div>
+        </div>
+        <nav>
+            @if (RoleAccess.Can(role, "dashboard", 'v')) { <a class="sidebar-link active" href="/Home/Dashboard">Dashboard</a> }
+            @if (RoleAccess.Can(role, "gate", 'v')) { <a class="sidebar-link" href="/Management/Gate">Gate Simulator</a> }
+            @if (RoleAccess.Can(role, "reconciliation", 'v')) { <a class="sidebar-link" href="/Management/Reconciliation">Reconciliation</a> }
+            @if (RoleAccess.Can(role, "households", 'v')) { <a class="sidebar-link" href="/Management/Households">Households &amp; Tags</a> }
+            @if (RoleAccess.Can(role, "distributors", 'v')) { <a class="sidebar-link" href="/Management/Distributors">Distributors</a> }
+            @if (RoleAccess.Can(role, "analytics", 'v')) { <a class="sidebar-link" href="/Management/Analytics">Analytics &amp; Reports</a> }
+            <div class="sidebar-caption">Operations</div>
+            @if (RoleAccess.Can(role, "menus", 'v')) { <a class="sidebar-link" href="/Management/Menus">Daily Menus</a> }
+            @if (RoleAccess.Can(role, "expenses", 'v')) { <a class="sidebar-link" href="/Management/Expenses">Expenses</a> }
+            @if (RoleAccess.Can(role, "feedback", 'v')) { <a class="sidebar-link" href="/Management/Feedback">Member Feedback</a> }
+            @if (RoleAccess.Can(role, "queries", 'v')) { <a class="sidebar-link" href="/Management/Queries">Member Queries</a> }
+            @if (RoleAccess.Can(role, "notifications", 'v')) { <a class="sidebar-link" href="/Management/Notifications">Notifications</a> }
+            @if (RoleAccess.Can(role, "audit", 'v')) { <a class="sidebar-link" href="/Management/AuditLogs">Audit Logs</a> }
+            @if (RoleAccess.Can(role, "users", 'v')) { <a class="sidebar-link" href="/Management/Users">System Users</a> }
+            @if (RoleAccess.Can(role, "roles", 'v')) { <a class="sidebar-link" href="/Management/Roles">Roles &amp; Permissions</a> }
+        </nav>
+    </aside>
+
+    <main class="main-panel">
+        <div class="topbar">
+            <div class="topbar-date">@Model.SelectedDate</div>
+            <div class="topbar-actions">
+                <span class="user-pill">@Model.Role</span>
+                <button type="button" class="topbar-btn" data-theme-toggle aria-label="Toggle color theme">Dark mode</button>
+                <form asp-action="Logout" method="post" style="margin:0;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="topbar-btn">Logout</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="dashboard-content">
+            <div class="hello-row">
+                <h1>Welcome, <span class="welcome-name">@Model.UserName</span></h1>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card positive">
+                    <div class="stat-value">@Model.CollectionRate%</div>
+                    <div class="stat-label">Collection rate</div>
+                </div>
+                <div class="stat-card positive">
+                    <div class="stat-value">@Model.Collected</div>
+                    <div class="stat-label">Collected</div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-value">@Model.Pending</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+                <div class="stat-card danger">
+                    <div class="stat-value">₹@Model.ExpenseThisMonth.ToString("#,##0", inr)</div>
+                    <div class="stat-label">Expense this month</div>
+                </div>
+                <div class="stat-card danger">
+                    <div class="stat-value">@Model.OnHold</div>
+                    <div class="stat-label">On hold</div>
+                </div>
+            </div>
+
+            <div class="dashboard-detail-grid">
+                <div class="panel">
+                    <h3>Performance</h3>
+                    <div class="donut-wrap">
+                        <div class="donut" style="background: conic-gradient(#2ca06b 0 @Model.CollectionRate%, #d9e4dc @Model.CollectionRate% 100%);"><strong>@Model.CollectionRate%</strong></div>
+                        <div class="donut-legend">
+                            <div class="legend-row"><span class="legend-swatch green"></span>@Model.Collected collected</div>
+                            <div class="legend-row"><span class="legend-swatch gray"></span>@Model.Pending pending</div>
+                            <div class="legend-row"><span class="legend-swatch rose"></span>@Model.OnHold on hold</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>Today status</h3>
+                    <div class="pie-wrap">
+                        <div class="pie-chart" style="background: conic-gradient(#5aa86e 0 @Model.CollectedShare%, #d6a98a @Model.CollectedShare% @(Model.CollectedShare + Model.PendingShare)%, #d5d8cf @(Model.CollectedShare + Model.PendingShare)% 100%);"></div>
+                    </div>
+                    <p class="muted">@Model.Collected collected · @Model.Pending pending · @Model.OnHold on hold</p>
+                </div>
+
+                <div class="panel">
+                    <h3>Cost per thali</h3>
+                    <div class="cost-value">₹@Model.CostPerThali.ToString("N2", inr)</div>
+                    <p class="muted">This month · @Model.TodayMenu</p>
+                </div>
+            </div>
+
+            <div class="grid-two">
+                <div class="panel">
+                    <h3>Collection rate — 14 days</h3>
+                    <div class="chart-bars" style="height:180px; align-items:flex-end;">
+                        @foreach (var day in Model.CollectionTrend)
+                        {
+                            <div class="chart-bar" title="@day.Date.ToString("dd MMM"): @day.Rate%" style="height:@day.Rate%"></div>
+                        }
+                    </div>
+                    @if (Model.CollectionTrend.All(day => day.Collected == 0))
+                    {
+                        <p class="chart-empty-state muted">No collections recorded in the last 14 days.</p>
+                    }
+                </div>
+
+                <div class="panel">
+                    <h3>Expense by category</h3>
+                    <table class="data-table">
+                        <tbody>
+                            @foreach (var expense in Model.ExpenseCategories)
+                            {
+                                <tr><td>@expense.Category</td><td>₹@expense.Total.ToString("#,##0.00", inr)</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="grid-two" style="margin-top:20px;">
+                <div class="panel table-wrap">
+                    <h3>Distributors today</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Distributor</th>
+                                <th>Assigned</th>
+                                <th>Collected</th>
+                                <th>Missing</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var distributor in Model.DistributorRows)
+                            {
+                                <tr><td>@distributor.Name</td><td>@distributor.Expected</td><td>@distributor.Collected</td><td>@(distributor.Expected - distributor.Collected)</td></tr>
+                            }
+                            @if (Model.DistributorRows.Count == 0)
+                            {
+                                <tr><td colspan="4" class="muted">No households assigned to distributors.</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="panel table-wrap">
+                    <h3>Recent activity</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>When</th>
+                                <th>By</th>
+                                <th>Action</th>
+                                <th>Item</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.RecentActivity)
+                            {
+                                <tr>
+                                    <td>@item.When</td>
+                                    <td>@item.By</td>
+                                    <td>@item.Action</td>
+                                    <td>@item.Item</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>

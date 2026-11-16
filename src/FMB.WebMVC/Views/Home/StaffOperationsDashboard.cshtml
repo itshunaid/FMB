@@ -1,0 +1,205 @@
+@model FMB.WebMVC.Controllers.DashboardViewModel
+@using System.Globalization
+@using FMB.WebMVC.Services
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Dashboard";
+    var sessionUser = Context.Session.GetString("FMB.Auth.User");
+    var role = sessionUser?.Split('|').ElementAtOrDefault(3) ?? string.Empty;
+    var inr = new CultureInfo("en-IN");
+    var widgets = RoleAccess.GetVisibleDashboardWidgets(role).ToHashSet(StringComparer.Ordinal);
+}
+
+<div class="app-shell">
+    <aside class="sidebar">
+        <div class="sidebar-brand"><div class="sidebar-logo">✦</div><strong>FMB Tiffin</strong></div>
+        <nav>
+            @if (RoleAccess.Can(role, "dashboard", 'v')) { <a class="sidebar-link active" href="/Home/Dashboard">Dashboard</a> }
+            @if (RoleAccess.Can(role, "gate", 'v')) { <a class="sidebar-link" href="/Management/Gate">Gate Simulator</a> }
+            @if (RoleAccess.Can(role, "reconciliation", 'v')) { <a class="sidebar-link" href="/Management/Reconciliation">Reconciliation</a> }
+            @if (RoleAccess.Can(role, "households", 'v')) { <a class="sidebar-link" href="/Management/Households">Households &amp; Tags</a> }
+            @if (RoleAccess.Can(role, "distributors", 'v')) { <a class="sidebar-link" href="/Management/Distributors">Distributors</a> }
+            @if (RoleAccess.Can(role, "analytics", 'v')) { <a class="sidebar-link" href="/Management/Analytics">Analytics &amp; Reports</a> }
+            <div class="sidebar-caption">Operations</div>
+            @if (RoleAccess.Can(role, "menus", 'v')) { <a class="sidebar-link" href="/Management/Menus">Daily Menus</a> }
+            @if (RoleAccess.Can(role, "expenses", 'v')) { <a class="sidebar-link" href="/Management/Expenses">Expenses</a> }
+            @if (RoleAccess.Can(role, "feedback", 'v')) { <a class="sidebar-link" href="/Management/Feedback">Member Feedback</a> }
+            @if (RoleAccess.Can(role, "queries", 'v')) { <a class="sidebar-link" href="/Management/Queries">Member Queries</a> }
+            @if (RoleAccess.Can(role, "notifications", 'v')) { <a class="sidebar-link" href="/Management/Notifications">Notifications</a> }
+            @if (RoleAccess.Can(role, "audit", 'v')) { <a class="sidebar-link" href="/Management/AuditLogs">Audit Logs</a> }
+            @if (RoleAccess.Can(role, "users", 'v')) { <a class="sidebar-link" href="/Management/Users">System Users</a> }
+            @if (RoleAccess.Can(role, "roles", 'v')) { <a class="sidebar-link" href="/Management/Roles">Roles &amp; Permissions</a> }
+        </nav>
+    </aside>
+    <main class="main-panel">
+        <div class="topbar">
+            <div class="topbar-date">Hussaini Alam · @Model.SelectedDate</div>
+            <div class="topbar-actions">
+                <span class="user-pill">@Model.UserName · @Model.Role</span>
+                <button type="button" class="topbar-btn" data-theme-toggle aria-label="Toggle color theme">Dark mode</button>
+                <form asp-controller="Home" asp-action="Logout" method="post" style="margin:0;">
+                    @Html.AntiForgeryToken()<button type="submit" class="topbar-btn">Logout</button>
+                </form>
+            </div>
+        </div>
+        <div class="dashboard-content">
+            <div class="hello-row"><h1>Welcome, <span class="welcome-name">@Model.UserName</span></h1></div>
+            @if (Model.Role != "Admin")
+            {
+                @if (widgets.Contains("kpi_ops"))
+                {
+                    <div class="stats-grid">
+                        <div class="stat-card positive"><div class="stat-value">@Model.CollectionRate%</div><div class="stat-label">Collection rate</div></div>
+                        <div class="stat-card positive"><div class="stat-value">@Model.Collected</div><div class="stat-label">Collected</div></div>
+                        <div class="stat-card warning"><div class="stat-value">@Model.Pending</div><div class="stat-label">Pending</div></div>
+                        <div class="stat-card danger"><div class="stat-value">@Model.OnHold</div><div class="stat-label">On hold</div></div>
+                    </div>
+                }
+                @if (widgets.Contains("kpi_fin"))
+                {
+                    <div class="stats-grid">
+                        <div class="stat-card danger"><div class="stat-value">₹@Model.ExpenseThisMonth.ToString("#,##0", inr)</div><div class="stat-label">Expense this month</div></div>
+                        <div class="stat-card positive"><div class="stat-value">₹@Model.CostPerThali.ToString("N2", inr)</div><div class="stat-label">Average cost per thali</div></div>
+                        <div class="stat-card warning"><div class="stat-value">@Model.ExpenseDaysMissing</div><div class="stat-label">Recent menus without expenses</div></div>
+                    </div>
+                }
+                <div class="grid-two">
+                    @if (widgets.Contains("g_perf"))
+                    {
+                        <section class="panel">
+                            <h2>Collection rate · last 14 days</h2>
+                            <div class="chart-bars" style="height:150px;align-items:flex-end">
+                                @foreach (var day in Model.CollectionTrend)
+                                {
+                                    <div class="chart-bar" title="@day.Date.ToString("dd MMM"): @day.Rate%" style="height:@day.Rate%"></div>
+                                }
+                            </div>
+                        </section>
+                    }
+                    @if (widgets.Contains("d_status"))
+                    {
+                        <section class="panel table-wrap">
+                            <h2>Distributor collection today</h2>
+                            <table class="data-table">
+                                <thead><tr><th>Distributor</th><th>Assigned</th><th>Collected</th><th>Missing</th></tr></thead>
+                                <tbody>
+                                @foreach (var item in Model.DistributorRows)
+                                {
+                                    <tr><td>@item.Name</td><td>@item.Expected</td><td>@item.Collected</td><td>@(item.Expected - item.Collected)</td></tr>
+                                }
+                                </tbody>
+                            </table>
+                        </section>
+                    }
+                    @if (widgets.Contains("p_cat"))
+                    {
+                        <section class="panel">
+                            <h2>Expense by category</h2>
+                            <table class="data-table">
+                                <tbody>@foreach (var item in Model.ExpenseCategories) { <tr><td>@item.Category</td><td>₹@item.Total.ToString("#,##0.00", inr)</td></tr> }</tbody>
+                            </table>
+                        </section>
+                    }
+                    @if (widgets.Contains("q_open"))
+                    {
+                        <section class="panel">
+                            <h2>Open member queries</h2>
+                            <strong>@Model.OpenQueries</strong>
+                            @if (RoleAccess.Can(role, "queries", 'v')) { <a class="btn-sm" href="/Management/Queries">Review queries</a> }
+                        </section>
+                    }
+                </div>
+                @if (widgets.Contains("l_cost") || widgets.Contains("fb_gauge"))
+                {
+                    <div class="stats-grid">
+                        @if (widgets.Contains("l_cost")) { <div class="stat-card positive"><div class="stat-value">₹@Model.CostPerThali.ToString("N2", inr)</div><div class="stat-label">Cost per thali</div></div> }
+                        @if (widgets.Contains("fb_gauge")) { <div class="stat-card positive"><div class="stat-value">@(Model.AverageRating == 0 ? "—" : Model.AverageRating.ToString("0.0"))</div><div class="stat-label">Average feedback rating</div></div> }
+                    </div>
+                }
+                @if (widgets.Contains("tasks"))
+                {
+                    <section class="panel">
+                        <h2>Quick tasks</h2>
+                        <div class="action-cell">
+                            @if (RoleAccess.Can(role, "gate", 'v')) { <a class="btn-sm" href="/Management/Gate">Gate simulator</a> }
+                            @if (RoleAccess.Can(role, "reconciliation", 'v')) { <a class="btn-sm" href="/Management/Reconciliation">Reconciliation</a> }
+                            @if (RoleAccess.Can(role, "expenses", 'v')) { <a class="btn-sm" href="/Management/Expenses">Expenses</a> }
+                            @if (RoleAccess.Can(role, "feedback", 'v')) { <a class="btn-sm" href="/Management/Feedback">Feedback</a> }
+                        </div>
+                    </section>
+                }
+                @if (widgets.Count == 0)
+                {
+                    <section class="panel"><p>Select dashboard widgets from Roles &amp; Permissions to personalize this dashboard.</p></section>
+                }
+            }
+            else if (Model.Role == "Volunteer")
+            {
+                <div class="stats-grid">
+                    <div class="stat-card positive"><div class="stat-value">@Model.CollectionRate%</div><div class="stat-label">Collection rate</div></div>
+                    <div class="stat-card positive"><div class="stat-value">@Model.Collected</div><div class="stat-label">Collected</div></div>
+                    <div class="stat-card warning"><div class="stat-value">@Model.Pending</div><div class="stat-label">Pending</div></div>
+                    <div class="stat-card danger"><div class="stat-value">@Model.OnHold</div><div class="stat-label">On hold</div></div>
+                </div>
+                <section class="panel">
+                    <h2>Today's tasks</h2>
+                    <p>Menu: <strong>@(string.IsNullOrWhiteSpace(Model.TodayMenu) ? "Not posted" : Model.TodayMenu)</strong></p>
+                    <div class="action-cell">
+                        <a class="btn" href="/Management/Gate">Open gate simulator</a>
+                        <a class="btn-sm" href="/Management/Reconciliation">Open reconciliation</a>
+                    </div>
+                </section>
+                <div class="grid-two">
+                    <section class="panel">
+                        <h2>Collection rate · last 14 days</h2>
+                        <div class="chart-bars" style="height:150px;align-items:flex-end">
+                            @foreach (var day in Model.CollectionTrend)
+                            {
+                                <div class="chart-bar" title="@day.Date.ToString("dd MMM"): @day.Rate%" style="height:@day.Rate%"></div>
+                            }
+                        </div>
+                    </section>
+                    <section class="panel table-wrap">
+                        <h2>Distributor collection today</h2>
+                        <table class="data-table">
+                            <thead><tr><th>Distributor</th><th>Assigned</th><th>Collected</th><th>Missing</th></tr></thead>
+                            <tbody>
+                            @foreach (var item in Model.DistributorRows)
+                            {
+                                <tr><td>@item.Name</td><td>@item.Expected</td><td>@item.Collected</td><td>@(item.Expected - item.Collected)</td></tr>
+                            }
+                            </tbody>
+                        </table>
+                    </section>
+                </div>
+            }
+            else
+            {
+                <div class="stats-grid">
+                    <div class="stat-card danger"><div class="stat-value">₹@Model.ExpenseThisMonth.ToString("#,##0", inr)</div><div class="stat-label">Expense this month</div></div>
+                    <div class="stat-card positive"><div class="stat-value">₹@Model.CostPerThali.ToString("N2", inr)</div><div class="stat-label">Average cost per thali</div></div>
+                    <div class="stat-card warning"><div class="stat-value">@Model.ExpenseDaysMissing</div><div class="stat-label">Recent menus without expenses</div></div>
+                    <div class="stat-card warning"><div class="stat-value">@Model.OpenQueries</div><div class="stat-label">Open queries</div></div>
+                    <div class="stat-card positive"><div class="stat-value">@(Model.AverageRating == 0 ? "—" : Model.AverageRating.ToString("0.0"))</div><div class="stat-label">Average rating · 10 days</div></div>
+                </div>
+                <div class="grid-two">
+                    <section class="panel">
+                        <h2>Expense by category</h2>
+                        <table class="data-table">
+                            <tbody>@foreach (var item in Model.ExpenseCategories) { <tr><td>@item.Category</td><td>₹@item.Total.ToString("#,##0.00", inr)</td></tr> }</tbody>
+                        </table>
+                    </section>
+                    <section class="panel">
+                        <h2>Back office</h2>
+                        <div class="action-cell">
+                            <a class="btn" href="/Management/Expenses">Review expenses</a>
+                            <a class="btn-sm" href="/Management/Feedback">Member feedback</a>
+                            <a class="btn-sm" href="/Management/Queries">Member queries</a>
+                            <a class="btn-sm" href="/Management/Menus">Daily menus</a>
+                        </div>
+                    </section>
+                </div>
+            }
+        </div>
+    </main>
+</div>

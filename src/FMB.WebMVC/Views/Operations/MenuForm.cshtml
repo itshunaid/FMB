@@ -1,0 +1,19 @@
+@model MenuFormViewModel
+@{
+    Layout = "~/Views/Management/_Layout.cshtml";
+    var isEdit = ViewContext.RouteData.Values["date"] is not null;
+    ViewData["Title"] = isEdit ? "Edit menu" : "Add menu";
+    var action = isEdit ? $"/Management/Menus/{Model.Date:yyyy-MM-dd}/Edit" : "/Management/Menus/Create";
+}
+<div class="page-heading"><div><h1>@ViewData["Title"]</h1><p>Set the menu name and service date.</p></div><a class="btn-sm" href="/Management/Menus">Back to menus</a></div>
+<div class="panel form-panel">
+    <form method="post" action="@action" class="form-grid">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="validation-message"></div>
+        <label asp-for="Date">Service date<input asp-for="Date" type="date" /></label>
+        <span asp-validation-for="Date" class="validation-message"></span>
+        <label asp-for="MenuName">Menu name<input asp-for="MenuName" maxlength="200" placeholder="Enter daily menu" /></label>
+        <span asp-validation-for="MenuName" class="validation-message"></span>
+        <div class="form-actions"><button class="btn" type="submit">Save menu</button><a class="btn-sm" href="/Management/Menus">Cancel</a></div>
+    </form>
+</div>

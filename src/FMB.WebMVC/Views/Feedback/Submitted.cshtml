@@ -1,0 +1,13 @@
+@model FeedbackFormViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Feedback received";
+}
+<main class="public-form-page">
+    <section class="panel public-form-card submitted-card">
+        <div class="success-mark">✓</div>
+        <h1>Thank you for your feedback</h1>
+        <p>Your response for <strong>@Model.MenuName</strong> has been recorded.</p>
+        <p class="muted">Your feedback helps the FMB team improve the service for everyone.</p>
+    </section>
+</main>

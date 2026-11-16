@@ -1,0 +1,16 @@
+@model QueryFormViewModel
+@{
+    Layout = "~/Views/Management/_Layout.cshtml";
+    ViewData["Title"] = "Add query";
+}
+<div class="page-heading"><div><h1>Add member query</h1><p>Record a member question for follow-up.</p></div><a class="btn-sm" href="/Management/Queries">Back to queries</a></div>
+<div class="panel form-panel">
+    <form method="post" action="/Management/Queries/Create" class="form-grid">
+        @Html.AntiForgeryToken()<div asp-validation-summary="ModelOnly" class="validation-message form-span"></div>
+        <label asp-for="ItsId">ITS ID<input asp-for="ItsId" inputmode="numeric" /></label><span asp-validation-for="ItsId" class="validation-message"></span>
+        <label asp-for="MemberName">Member name<input asp-for="MemberName" /></label><span asp-validation-for="MemberName" class="validation-message"></span>
+        <label asp-for="Subject" class="form-span">Subject<input asp-for="Subject" /></label><span asp-validation-for="Subject" class="validation-message"></span>
+        <label asp-for="Message" class="form-span">Message<textarea asp-for="Message" rows="5"></textarea></label><span asp-validation-for="Message" class="validation-message"></span>
+        <div class="form-actions form-span"><button class="btn" type="submit">Save query</button><a class="btn-sm" href="/Management/Queries">Cancel</a></div>
+    </form>
+</div>

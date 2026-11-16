@@ -1,0 +1,43 @@
+@model QueriesViewModel
+@{
+    Layout = "~/Views/Management/_Layout.cshtml";
+    ViewData["Title"] = "Queries";
+    var role = Context.Session.GetString("FMB.Auth.User")?.Split('|').ElementAtOrDefault(3) ?? string.Empty;
+}
+<div class="page-heading"><div><h1>Member Queries</h1><p>Review and respond to member questions and requests.</p></div>@if (RoleAccess.Can(role, "queries", 'c')) { <a class="btn" href="/Management/Queries/Create">+ Add query</a> }</div>
+@if (!string.IsNullOrWhiteSpace(Model.Message)) { <div class="notice">@Model.Message</div> }
+<section class="panel filter-panel">
+    <form method="get" action="/Management/Queries" class="filter-form">
+        <label>Search<input name="search" value="@Model.Search" placeholder="ITS ID, member or subject..." /></label>
+        <label>Status<select name="status"><option value="">All statuses</option>@foreach (var value in new[] { "Open", "In Progress", "Resolved" }) { <option value="@value" selected="@(value == Model.StatusFilter)">@value</option> }</select></label>
+        <button class="btn" type="submit">Apply filters</button><a class="btn-sm" href="/Management/Queries">Clear</a>
+        @if (RoleAccess.Can(role, "queries", 'x')) { <a class="btn-sm" href="@Url.Action("ExportQueries", new { search = Model.Search, status = Model.StatusFilter })">Export CSV</a> }
+    </form>
+</section>
+<div class="panel table-wrap">
+    <table class="data-table">
+        <thead><tr><th>ITS ID</th><th>Member</th><th>Subject / Message</th><th>Reply</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+        @if (Model.Rows.Count == 0) { <tr><td colspan="6" class="empty-state">No queries match these filters.</td></tr> }
+        @foreach (var row in Model.Rows)
+        {
+            <tr>
+                <td>@row.ItsId</td><td>@row.MemberName</td>
+                <td><strong>@row.Subject</strong><br /><span class="muted">@row.Message</span></td>
+                <td>@(string.IsNullOrWhiteSpace(row.Reply) ? "—" : row.Reply)</td>
+                <td><span class="status-chip">@row.Status</span></td>
+                <td class="action-cell">
+                    @if (RoleAccess.Can(role, "queries", 'e')) { <a class="btn-sm" href="/Management/Queries/@row.Id/Reply">@(row.Reply is null ? "Reply" : "Edit reply")</a> }
+                    @if (RoleAccess.Can(role, "audit", 'v')) { <a class="btn-sm" href="/Management/AuditLogs?search=@row.Id">Logs</a> }
+                    @if (RoleAccess.Can(role, "queries", 'd'))
+                    {
+                        <form method="post" action="/Management/Queries/@row.Id/Delete" onsubmit="return confirm('Delete this query?');">
+                            @Html.AntiForgeryToken()<button class="btn-sm btn-danger" type="submit">Delete</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

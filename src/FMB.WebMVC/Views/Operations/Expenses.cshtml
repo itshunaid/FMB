@@ -1,0 +1,75 @@
+@model ExpensesViewModel
+@{
+    Layout = "~/Views/Management/_Layout.cshtml";
+    ViewData["Title"] = "Expenses";
+    var total = Model.Rows.Sum(row => row.Total);
+    var role = Context.Session.GetString("FMB.Auth.User")?.Split('|').ElementAtOrDefault(3) ?? string.Empty;
+}
+<div class="page-heading">
+    <div><h1>Expenses</h1><p>Daily kitchen costs, meal count and per-thali spend.</p></div>
+    @if (RoleAccess.Can(role, "expenses", 'c')) { <a class="btn" href="/Management/Expenses/Create">+ Add expense</a> }
+</div>
+@if (!string.IsNullOrWhiteSpace(Model.Message)) { <div class="notice">@Model.Message</div> }
+<div class="stats-grid compact-stats">
+    <div class="stat-card"><span>Records</span><strong>@Model.Rows.Count</strong></div>
+    <div class="stat-card"><span>Filtered total</span><strong>₹@total.ToString("N2")</strong></div>
+    <div class="stat-card"><span>Average / thali</span><strong>₹@((Model.Rows.Sum(row => row.ThaliCount) == 0 ? 0 : total / Model.Rows.Sum(row => row.ThaliCount)).ToString("N2"))</strong></div>
+</div>
+<section class="panel filter-panel">
+    <form method="get" action="/Management/Expenses" class="filter-form">
+        <label>Search<input name="search" value="@Model.Search" placeholder="Search menu or date..." /></label>
+        <label>Menu<select name="menu"><option value="">All menus</option>@foreach (var value in Model.MenuNames) { <option value="@value" selected="@(value == Model.MenuFilter)">@value</option> }</select></label>
+        <label>Date<input type="date" name="date" value="@Model.SelectedDate?.ToString("yyyy-MM-dd")" /></label>
+        <button class="btn" type="submit">Apply filters</button>
+        <a class="btn-sm" href="/Management/Expenses">Clear</a>
+        @if (RoleAccess.Can(role, "expenses", 'x')) { <a class="btn-sm" href="@Url.Action("ExportExpenses", new { search = Model.Search, menu = Model.MenuFilter, date = Model.SelectedDate?.ToString("yyyy-MM-dd") })">Export CSV</a> }
+    </form>
+</section>
+<div class="panel table-wrap">
+    <table class="data-table">
+        <thead><tr><th>Date</th><th>Menu</th><th>Thalis</th><th>Total cost</th><th>Per thali</th><th>Cost categories</th><th>Actions</th></tr></thead>
+        <tbody>
+        @if (Model.Rows.Count == 0) { <tr><td colspan="7" class="empty-state">No expense records match these filters.</td></tr> }
+        @foreach (var row in Model.Rows)
+        {
+            <tr>
+                <td>@row.Date.ToString("dd MMM yyyy")</td><td>@row.MenuName</td><td>@row.ThaliCount</td>
+                <td>₹@row.Total.ToString("N2")</td><td>₹@row.PerThali.ToString("N2")</td><td>@row.CategoryCount</td>
+                <td class="action-cell">
+                    @if (RoleAccess.Can(role, "expenses", 'e')) { <a class="btn-sm" href="/Management/Expenses/@row.Date.ToString("yyyy-MM-dd")/Edit">Edit</a> }
+                    <button class="btn-sm" type="button" data-expense-view
+                            data-date="@row.Date.ToString("dd MMM yyyy")" data-menu="@row.MenuName"
+                            data-thalis="@row.ThaliCount" data-total="@row.Total.ToString("N2")"
+                            data-per-thali="@row.PerThali.ToString("N2")" data-groceries="@row.Groceries.ToString("N2")"
+                            data-meat="@row.Meat.ToString("N2")" data-gas="@row.Gas.ToString("N2")"
+                            data-labour="@row.Labour.ToString("N2")" data-packaging="@row.Packaging.ToString("N2")"
+                            data-other="@row.Other.ToString("N2")" data-notes="@row.Notes">View</button>
+                    @if (RoleAccess.Can(role, "expenses", 'd'))
+                    {
+                        <form method="post" action="/Management/Expenses/@row.Date.ToString("yyyy-MM-dd")/Delete" onsubmit="return confirm('Delete this expense record?');">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn-sm btn-danger">Delete</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+<div class="modal-backdrop" id="expense-view-modal" hidden>
+    <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="expense-view-title">
+        <button class="modal-close" type="button" data-modal-close aria-label="Close">×</button>
+        <h2 id="expense-view-title">Expense details</h2>
+        <p><strong data-expense-menu></strong> · <span data-expense-date></span></p>
+        <dl class="detail-grid">
+            <dt>Thali count</dt><dd data-expense-thalis></dd><dt>Total cost</dt><dd>₹<span data-expense-total></span></dd>
+            <dt>Per thali</dt><dd>₹<span data-expense-per-thali></span></dd>
+            <dt>Groceries</dt><dd>₹<span data-expense-groceries></span></dd><dt>Meat</dt><dd>₹<span data-expense-meat></span></dd>
+            <dt>Gas</dt><dd>₹<span data-expense-gas></span></dd><dt>Labour</dt><dd>₹<span data-expense-labour></span></dd>
+            <dt>Packaging</dt><dd>₹<span data-expense-packaging></span></dd><dt>Other</dt><dd>₹<span data-expense-other></span></dd>
+            <dt>Notes</dt><dd data-expense-notes></dd>
+        </dl>
+        <button class="btn-sm" type="button" data-modal-close>Close</button>
+    </section>
+</div>

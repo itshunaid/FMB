@@ -1,0 +1,31 @@
+@model FeedbackFormViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Menu feedback";
+    var householdFeedback = ViewBag.HouseholdFeedback is true;
+}
+<main class="public-form-page">
+    <section class="panel public-form-card">
+        <div class="public-brand">FMB · Hussaini Alam</div>
+        <h1>Menu Feedback</h1>
+        <p class="muted">Share your experience to help us improve the daily tiffin service.</p>
+        <form method="post" action="/Feedback/Submit" class="form-grid public-form">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="All" class="validation-message form-span"></div>
+            <label asp-for="Date">Service date<input asp-for="Date" type="date" readonly /></label>
+            <span asp-validation-for="Date" class="validation-message"></span>
+            <label asp-for="MenuName">Menu<input asp-for="MenuName" readonly /></label>
+            <span asp-validation-for="MenuName" class="validation-message"></span>
+            <label asp-for="ItsId" class="form-span">ITS ID<input asp-for="ItsId" inputmode="numeric" autocomplete="off" placeholder="Enter your ITS ID" readonly="@(householdFeedback ? "readonly" : null)" /></label>
+            <span asp-validation-for="ItsId" class="validation-message form-span"></span>
+            <label asp-for="Rating">Overall rating<select asp-for="Rating"><option value="5">5 — Excellent</option><option value="4">4 — Good</option><option value="3">3 — Average</option><option value="2">2 — Poor</option><option value="1">1 — Very poor</option></select></label>
+            <label asp-for="Quantity">Portion size<select asp-for="Quantity"><option>Right</option><option>Less</option><option>More</option></select></label>
+            <label asp-for="Quality">Food quality<select asp-for="Quality"><option>Excellent</option><option>Good</option><option>Average</option><option>Poor</option></select></label>
+            <span asp-validation-for="Rating" class="validation-message"></span>
+            <span asp-validation-for="Quantity" class="validation-message"></span>
+            <span asp-validation-for="Quality" class="validation-message"></span>
+            <label asp-for="Comment" class="form-span">Comments<textarea asp-for="Comment" rows="4" maxlength="1000" placeholder="Anything else you'd like us to know?"></textarea></label>
+            <div class="form-actions form-span"><button class="btn" type="submit">Submit feedback</button></div>
+        </form>
+    </section>
+</main>

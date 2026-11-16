@@ -1,0 +1,31 @@
+@baseUrl = http://localhost:49918
+
+### Gate collection statistics for today
+GET {{baseUrl}}/api/gate/stats
+Accept: application/json
+
+### Gate collection statistics for a specific day
+GET {{baseUrl}}/api/gate/stats?date=2026-11-15
+Accept: application/json
+
+### Record a gate scan using the reader-provided timestamp
+POST {{baseUrl}}/api/gate/scan
+Content-Type: application/json
+
+{
+  "TagID": "RFID-1001",
+  "Timestamp": "2026-11-15T21:18:00+05:30",
+  "GateId": "MAIN-GATE",
+  "Source": "Auto"
+}
+
+### Unknown tag returns 404 and is audited
+POST {{baseUrl}}/api/gate/scan
+Content-Type: application/json
+
+{
+  "TagID": "UNKNOWN-TAG",
+  "Timestamp": "2026-11-15T21:19:00+05:30",
+  "GateId": "MAIN-GATE",
+  "Source": "Auto"
+}

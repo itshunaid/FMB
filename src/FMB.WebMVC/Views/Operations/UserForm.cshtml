@@ -1,0 +1,20 @@
+@model UserFormViewModel
+@{
+    Layout = "~/Views/Management/_Layout.cshtml";
+    var isEdit = ViewContext.RouteData.Values["itsId"] is not null;
+    ViewData["Title"] = isEdit ? "Edit user" : "Add user";
+    var action = isEdit ? $"/Management/Users/{Uri.EscapeDataString(Model.ItsId)}/Edit" : "/Management/Users/Create";
+}
+<div class="page-heading"><div><h1>@ViewData["Title"]</h1><p>Set account details and access controls.</p></div><a class="btn-sm" href="/Management/Users">Back to users</a></div>
+<div class="panel form-panel">
+    <form method="post" action="@action" class="form-grid">
+        @Html.AntiForgeryToken()<div asp-validation-summary="ModelOnly" class="validation-message form-span"></div>
+        <label asp-for="ItsId">ITS ID<input asp-for="ItsId" readonly="@isEdit" /></label><span asp-validation-for="ItsId" class="validation-message"></span>
+        <label asp-for="Name">Full name<input asp-for="Name" /></label><span asp-validation-for="Name" class="validation-message"></span>
+        <label asp-for="Role">Role<select asp-for="Role">@foreach (var role in Model.AvailableRoles) { <option value="@role" selected="@(role == Model.Role)">@role</option> }</select></label>
+        <label asp-for="Phone">Phone<input asp-for="Phone" type="tel" /></label><span asp-validation-for="Phone" class="validation-message"></span>
+        <label asp-for="Status">Status<select asp-for="Status"><option>Active</option><option>Inactive</option></select></label>
+        <label asp-for="Pin">@(isEdit ? "New PIN (leave blank to keep current)" : "PIN")<input asp-for="Pin" type="password" autocomplete="new-password" /></label><span asp-validation-for="Pin" class="validation-message"></span>
+        <div class="form-actions form-span"><button class="btn" type="submit">Save user</button><a class="btn-sm" href="/Management/Users">Cancel</a></div>
+    </form>
+</div>

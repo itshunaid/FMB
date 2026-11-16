@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: fmb_sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=${SA_PASSWORD}
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql
+    networks:
+      - fmb-network
+    restart: unless-stopped
+
+  webapi:
+    image: fmb-webapi:latest
+    build:
+      context: .
+      dockerfile: src/FMB.WebAPI/Dockerfile
+    container_name: fmb_webapi
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=FMB_TiffinTracker;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;
+    ports:
+      - "5001:8080"
+    depends_on:
+      - sqlserver
+    networks:
+      - fmb-network
+    restart: unless-stopped
+
+  webmvc:
+    image: fmb-webmvc:latest
+    build:
+      context: .
+      dockerfile: src/FMB.WebMVC/Dockerfile
+    container_name: fmb_webmvc
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ApiSettings__BaseUrl=http://webapi:8080
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=FMB_TiffinTracker;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;
+    ports:
+      - "5000:8080"
+    depends_on:
+      - webapi
+    networks:
+      - fmb-network
+    restart: unless-stopped
+
+volumes:
+  mssql_data:
+
+networks:
+  fmb-network:
+    driver: bridge

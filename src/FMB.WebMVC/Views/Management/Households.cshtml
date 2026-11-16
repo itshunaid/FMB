@@ -1,0 +1,61 @@
+@model IReadOnlyList<FMB.Domain.Entities.Household>
+@{
+    Layout = "~/Views/Management/_Layout.cshtml";
+    ViewData["Title"] = "Households";
+    var role = Context.Session.GetString("FMB.Auth.User")?.Split('|').ElementAtOrDefault(3) ?? string.Empty;
+}
+
+<div class="page-heading">
+    <div><h1>Households &amp; RFID Tags</h1><p>Manage Momineen records and collection assignments.</p></div>
+    @if (RoleAccess.Can(role, "households", 'c')) { <a class="btn" href="/Management/CreateHousehold">Add household</a> }
+</div>
+@if (TempData["Message"] is string message)
+{
+    <div class="notice">@message</div>
+}
+<section class="panel filter-panel">
+    <form method="get" action="/Management/Households" class="filter-form">
+        <label>Search<input name="search" value="@ViewBag.Search" placeholder="ITS ID, member, phone or tag..." /></label>
+        <label>Zone<select name="zone"><option value="">All zones</option>@foreach (var value in (IReadOnlyList<string>)ViewBag.Zones) { <option value="@value" selected="@(value == (string?)ViewBag.Zone)">@value</option> }</select></label>
+        <label>Status<select name="status"><option value="">All statuses</option>@foreach (var value in new[] { "Active", "On Hold", "Discontinued" }) { <option value="@value" selected="@(value == (string?)ViewBag.Status)">@value</option> }</select></label>
+        <button class="btn" type="submit">Apply filters</button>
+        <a class="btn-sm" href="/Management/Households">Clear</a>
+        @if (RoleAccess.Can(role, "households", 'x')) { <a class="btn-sm" href="@Url.Action("ExportHouseholds", "Operations", new { search = (string?)ViewBag.Search, zone = (string?)ViewBag.Zone, status = (string?)ViewBag.Status })">Export CSV</a> }
+    </form>
+</section>
+<div class="panel table-wrap">
+    <div class="table-toolbar"><strong>@Model.Count household(s)</strong><span>Household identities and RFID assignments</span></div>
+    <table class="data-table">
+        <thead>
+            <tr><th>Thali No.</th><th>ITS ID</th><th>Name</th><th>Area / Zone</th><th>Contact</th><th>Members</th><th>RFID Tag</th><th>Distributor</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+        @if (Model.Count == 0) { <tr><td colspan="10" class="empty-state">No households match these filters.</td></tr> }
+        @foreach (var household in Model)
+        {
+            <tr>
+                <td>@household.ThaliNumber</td>
+                <td>@household.Id</td>
+                <td>@household.Name</td>
+                <td>@household.Zone<br /><span class="muted">@household.Address</span></td>
+                <td>@household.Phone</td>
+                <td>@household.Size</td>
+                <td><code>@household.TagId</code></td>
+                <td>@(household.Distributor?.Name ?? "—")</td>
+                <td><span class="status-chip">@household.Status</span></td>
+                <td class="action-cell">
+                    @if (RoleAccess.Can(role, "households", 'e')) { <a class="btn-sm" href="/Management/EditHousehold?id=@Uri.EscapeDataString(household.Id)">Edit</a> }
+                    @if (RoleAccess.Can(role, "households", 'd'))
+                    {
+                        <form action="/Management/DeleteHousehold" method="post" onsubmit="return confirm('Delete this household?');">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@household.Id" />
+                            <button class="btn-sm btn-danger" type="submit">Delete</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,51 @@
+@model UsersViewModel
+@{
+    Layout = "~/Views/Management/_Layout.cshtml";
+    ViewData["Title"] = "Users";
+}
+<div class="page-heading"><div><h1>System Users</h1><p>Manage application accounts, roles and access status.</p></div><a class="btn" href="/Management/Users/Create">+ Add user</a></div>
+@if (!string.IsNullOrWhiteSpace(Model.Message)) { <div class="notice">@Model.Message</div> }
+<section class="panel filter-panel">
+    <form method="get" action="/Management/Users" class="filter-form">
+        <label>Search<input name="search" value="@Model.Search" placeholder="ITS ID, name or phone..." /></label>
+        <label>Role<select name="role"><option value="">All roles</option>@foreach (var value in Model.AvailableRoles) { <option value="@value" selected="@(value == Model.RoleFilter)">@value</option> }</select></label>
+        <label>Status<select name="status"><option value="">All statuses</option>@foreach (var value in new[] { "Active", "Inactive" }) { <option value="@value" selected="@(value == Model.StatusFilter)">@value</option> }</select></label>
+        <button class="btn" type="submit">Apply filters</button><a class="btn-sm" href="/Management/Users">Clear</a>
+        <a class="btn-sm" href="@Url.Action("ExportUsers", new { search = Model.Search, role = Model.RoleFilter, status = Model.StatusFilter })">Export CSV</a>
+    </form>
+</section>
+<div class="panel table-wrap">
+    <table class="data-table">
+        <thead><tr><th>ITS ID</th><th>Name</th><th>Role</th><th>Phone</th><th>Status</th><th>Last login</th><th>Actions</th></tr></thead>
+        <tbody>
+        @if (Model.Rows.Count == 0) { <tr><td colspan="7" class="empty-state">No users match these filters.</td></tr> }
+        @foreach (var row in Model.Rows)
+        {
+            <tr>
+                <td>@row.ItsId</td><td>@row.Name</td><td>@row.Role</td><td>@(string.IsNullOrWhiteSpace(row.Phone) ? "—" : row.Phone)</td>
+                <td><span class="status-chip">@row.Status</span></td><td>@(row.LastLogin?.ToLocalTime().ToString("dd MMM yyyy, HH:mm") ?? "Never")</td>
+                <td class="action-cell">
+                    <button class="btn-sm" type="button" data-user-view data-its="@row.ItsId" data-name="@row.Name" data-role="@row.Role" data-phone="@row.Phone" data-status="@row.Status" data-last-login="@(row.LastLogin?.ToLocalTime().ToString("dd MMM yyyy, HH:mm") ?? "Never")">View</button>
+                    <a class="btn-sm" href="/Management/Users/@Uri.EscapeDataString(row.ItsId)/Edit">Edit</a>
+                    <a class="btn-sm" href="/Management/Users/@Uri.EscapeDataString(row.ItsId)/Activity">Activity</a>
+                    <form method="post" action="/Management/Users/@Uri.EscapeDataString(row.ItsId)/Delete" onsubmit="return confirm('Delete this system user?');">
+                        @Html.AntiForgeryToken()<button class="btn-sm btn-danger" type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+<div class="modal-backdrop" id="user-view-modal" hidden>
+    <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="user-view-title">
+        <button class="modal-close" type="button" data-modal-close aria-label="Close">×</button>
+        <h2 id="user-view-title">User details</h2>
+        <dl class="detail-grid">
+            <dt>ITS ID</dt><dd data-user-its></dd><dt>Name</dt><dd data-user-name></dd>
+            <dt>Role</dt><dd data-user-role></dd><dt>Phone</dt><dd data-user-phone></dd>
+            <dt>Status</dt><dd data-user-status></dd><dt>Last login</dt><dd data-user-last-login></dd>
+        </dl>
+        <button class="btn-sm" type="button" data-modal-close>Close</button>
+    </section>
+</div>

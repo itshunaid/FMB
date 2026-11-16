@@ -1,0 +1,51 @@
+@model RoleDetailsViewModel
+@using FMB.WebMVC.Services
+@{
+    Layout = "~/Views/Management/_Layout.cshtml";
+    ViewData["Title"] = "Role details";
+    var labels = new Dictionary<char, string>
+    {
+        ['v'] = "View", ['c'] = "Add", ['e'] = "Edit", ['d'] = "Delete",
+        ['l'] = "Activity logs", ['x'] = "Export"
+    };
+}
+<div class="page-heading">
+    <div><h1>@Model.Role</h1><p>@(Model.IsBuiltIn ? "Built-in role" : "Custom role") · @Model.AssignedUsers assigned user(s)</p></div>
+    <div class="form-actions">
+        @if (Model.CanManageRoles && Model.Role != "Admin") { <a class="btn-sm" href="/Management/Roles/@Uri.EscapeDataString(Model.Role)/Edit">Edit</a> }
+        @if (Model.CanManageRoles) { <a class="btn-sm" href="/Management/Roles/@Uri.EscapeDataString(Model.Role)/Activity">Activity logs</a> }
+        <a class="btn-sm" href="/Management/Roles">Back to roles</a>
+    </div>
+</div>
+<section class="panel table-wrap">
+    <div class="table-toolbar"><strong>Module permissions</strong><span>@RoleAccess.Modules.Count(module => Model.Permissions.ContainsKey(module.Key) && Model.Permissions[module.Key].Length > 0) module(s)</span></div>
+    <table class="data-table">
+        <thead><tr><th>Module</th><th>Permissions</th></tr></thead>
+        <tbody>
+        @foreach (var module in RoleAccess.Modules)
+        {
+            var permissions = Model.Permissions.TryGetValue(module.Key, out var value) ? value : string.Empty;
+            <tr>
+                <td>@module.Value</td>
+                <td>@(permissions.Length == 0 ? "No access" : string.Join(", ", permissions.Where(labels.ContainsKey).Select(permission => labels[permission])))</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</section>
+<section class="panel">
+    <h2>Dashboard widgets</h2>
+    @if (Model.DashboardWidgets.Count == 0)
+    {
+        <p class="muted">No dashboard widgets are assigned to this role.</p>
+    }
+    else
+    {
+        <ul>
+        @foreach (var widget in Model.DashboardWidgets)
+        {
+            <li>@(RoleAccess.DashboardWidgetOptions.TryGetValue(widget, out var label) ? label : widget)</li>
+        }
+        </ul>
+    }
+</section>

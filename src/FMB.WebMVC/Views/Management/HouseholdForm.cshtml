@@ -1,0 +1,80 @@
+@model FMB.WebMVC.Controllers.HouseholdFormViewModel
+@{
+    Layout = "~/Views/Management/_Layout.cshtml";
+    var editing = ViewContext.RouteData.Values["action"]?.ToString() == "EditHousehold";
+    ViewData["Title"] = editing ? "Edit Household" : "Add Household";
+}
+
+<div class="page-heading">
+    <div><h1>@ViewData["Title"]</h1><p>ITS ID, RFID tag, and household details.</p></div>
+    <a class="btn btn-secondary" href="/Management/Households">Back to households</a>
+</div>
+<form asp-action="@(editing ? "EditHousehold" : "CreateHousehold")" asp-route-id="@Model.Id" method="post" class="panel form-panel">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="validation-message"></div>
+    <div class="form-grid">
+        <div class="form-group">
+            <label asp-for="Id">ITS ID</label>
+            <input asp-for="Id" class="form-input" readonly="@(editing ? "readonly" : null)" />
+            <span asp-validation-for="Id" class="validation-message"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="ThaliNumber">Thali number</label>
+            <input asp-for="ThaliNumber" class="form-input" readonly />
+            <span asp-validation-for="ThaliNumber" class="validation-message"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Name">Household name</label>
+            <input asp-for="Name" class="form-input" />
+            <span asp-validation-for="Name" class="validation-message"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Address">Address</label>
+            <input asp-for="Address" class="form-input" />
+            <span asp-validation-for="Address" class="validation-message"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Zone">Zone / Area</label>
+            <input asp-for="Zone" class="form-input" />
+            <span asp-validation-for="Zone" class="validation-message"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Phone">Contact number</label>
+            <input asp-for="Phone" class="form-input" />
+            <span asp-validation-for="Phone" class="validation-message"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Size">Household size</label>
+            <input asp-for="Size" type="number" min="1" class="form-input" />
+            <span asp-validation-for="Size" class="validation-message"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="TagId">RFID Tag ID</label>
+            <input asp-for="TagId" class="form-input" />
+            <span asp-validation-for="TagId" class="validation-message"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="DistributorId">Bulk pickup distributor</label>
+            <select asp-for="DistributorId" asp-items="ViewBag.Distributors" class="form-input">
+                <option value="">No distributor</option>
+            </select>
+            <span asp-validation-for="DistributorId" class="validation-message"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Status">Status</label>
+            <select asp-for="Status" class="form-input">
+                <option>Active</option><option>On Hold</option><option>Discontinued</option>
+            </select>
+            <span asp-validation-for="Status" class="validation-message"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Password">@(editing ? "Set a new household password (optional)" : "Initial household password")</label>
+            <input asp-for="Password" type="password" class="form-input" autocomplete="new-password" />
+            <span asp-validation-for="Password" class="validation-message"></span>
+        </div>
+    </div>
+    <div class="form-actions">
+        <button type="submit" class="btn">Save household</button>
+        <a class="btn btn-secondary" href="/Management/Households">Cancel</a>
+    </div>
+</form>
